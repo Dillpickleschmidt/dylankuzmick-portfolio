@@ -2,20 +2,56 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
-const posts = await getCollection('blog');
+const posts = (await getCollection('blog')).sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+const [featured, ...rest] = posts;
 ---
 
-<Base title="Blog">
-	<h1>Blog</h1>
-	<ul>
-		{posts.map((post) => (
-			<li>
-				<a href={`/blog/${post.id}`}>
-					<h2>{post.data.title}</h2>
-					<p>{post.data.description}</p>
-					<time>{post.data.date}</time>
-				</a>
-			</li>
-		))}
-	</ul>
+<Base title="Blog — Dylan Kuzmick">
+	<section class="max-w-6xl mx-auto px-6 pt-12 md:pt-20 pb-8">
+		<h1 class="font-[family-name:var(--font-display)] text-[clamp(3rem,8vw,7rem)] leading-[0.88] tracking-tight">
+			BL<span class="text-[var(--color-accent)]">O</span>G
+		</h1>
+		<p class="mt-4 text-[var(--color-text-muted)] text-lg">Thoughts, process, and technical deep-dives.</p>
+	</section>
+
+	<!-- Featured post -->
+	{featured && (
+		<section class="max-w-6xl mx-auto px-6 pb-12">
+			<a href={`/blog/${featured.id}`} class="group block border border-[var(--color-border)] rounded-xl overflow-hidden transition-all duration-200 hover:border-[var(--color-accent)] hover:translate-y-[-2px] hover:shadow-[0_12px_40px_rgba(232,96,60,0.1)] bg-[var(--color-surface)]">
+				<div class="grid grid-cols-1 md:grid-cols-2">
+					<!-- Placeholder image -->
+					<div class="aspect-[16/10] md:aspect-auto bg-gradient-to-br from-[var(--color-surface-hover)] to-[var(--color-border)] flex items-center justify-center">
+						<span class="text-[var(--color-text-muted)] text-sm opacity-50">Featured</span>
+					</div>
+					<div class="p-6 md:p-10 flex flex-col justify-center">
+						<span class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-accent)]">Latest</span>
+						<h2 class="font-[family-name:var(--font-display)] text-3xl md:text-4xl tracking-wider mt-3 group-hover:text-[var(--color-accent)] transition-colors duration-150">{featured.data.title.toUpperCase()}</h2>
+						<p class="text-[var(--color-text-muted)] mt-3 leading-relaxed">{featured.data.description}</p>
+						<time class="text-xs text-[var(--color-text-muted)] mt-4 uppercase tracking-[0.15em]">{featured.data.date}</time>
+					</div>
+				</div>
+			</a>
+		</section>
+	)}
+
+	<!-- Remaining posts grid -->
+	{rest.length > 0 && (
+		<section class="max-w-6xl mx-auto px-6 pb-16">
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+				{rest.map(post => (
+					<a href={`/blog/${post.id}`} class="group block border border-[var(--color-border)] rounded-xl overflow-hidden transition-all duration-200 hover:border-[var(--color-accent)] hover:translate-y-[-2px] hover:shadow-[0_8px_30px_rgba(232,96,60,0.08)] bg-[var(--color-surface)]">
+						<!-- Placeholder image -->
+						<div class="aspect-[16/9] bg-gradient-to-br from-[var(--color-surface-hover)] to-[var(--color-border)] flex items-center justify-center">
+							<span class="text-[var(--color-text-muted)] text-xs opacity-40">Image</span>
+						</div>
+						<div class="p-5">
+							<h3 class="font-[family-name:var(--font-display)] text-xl tracking-wider group-hover:text-[var(--color-accent)] transition-colors duration-150">{post.data.title.toUpperCase()}</h3>
+							<p class="text-sm text-[var(--color-text-muted)] mt-2 leading-relaxed line-clamp-2">{post.data.description}</p>
+							<time class="text-xs text-[var(--color-text-muted)] mt-3 block uppercase tracking-[0.15em]">{post.data.date}</time>
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
+	)}
 </Base>

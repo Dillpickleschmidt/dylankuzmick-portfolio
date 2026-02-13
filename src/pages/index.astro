@@ -1,8 +1,86 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const skills = ['TypeScript', 'React', 'Node.js', 'Rust', 'PostgreSQL', 'Figma', 'AWS', 'Docker', 'GraphQL', 'Astro', 'Tailwind', 'Linux'];
+
+const projects = [
+	{
+		num: '01',
+		title: 'VOID ENGINE',
+		description: 'Real-time 3D rendering engine built from scratch in Rust and WebGPU. Pushes pixels at 120fps with zero dependencies.',
+		tags: ['Rust', 'WebGPU', 'WASM'],
+	},
+	{
+		num: '02',
+		title: 'SIGNAL',
+		description: 'Multiplayer collaborative whiteboard for distributed teams. Real-time sync with conflict-free replicated data types.',
+		tags: ['TypeScript', 'CRDTs', 'WebSocket'],
+	},
+	{
+		num: '03',
+		title: 'MONO CLI',
+		description: 'Opinionated monorepo toolchain. Dependency graph analysis, incremental builds, and smart task scheduling.',
+		tags: ['Go', 'DAG', 'CLI'],
+	},
+	{
+		num: '04',
+		title: 'TERRAFORM',
+		description: 'Generative landscape art tool. Procedural terrain, erosion simulation, and biome painting in the browser.',
+		tags: ['Canvas', 'Perlin', 'React'],
+	},
+];
 ---
 
 <Base title="Dylan Kuzmick">
-	<h1>Dylan Kuzmick</h1>
-	<p>Welcome to my portfolio. This is a placeholder — more to come.</p>
+	<!-- Hero -->
+	<section class="max-w-6xl mx-auto px-6 pt-20 pb-12 md:pt-32 md:pb-20">
+		<h1 class="font-[family-name:var(--font-display)] text-[clamp(4rem,14vw,10rem)] leading-[0.88] tracking-tight">
+			DYLAN<br/><span class="text-[var(--color-accent)]">KUZMICK</span>
+		</h1>
+		<p class="mt-6 text-lg md:text-xl text-[var(--color-text-muted)] max-w-xl leading-relaxed">
+			Full-stack developer and designer at the intersection of technology and expression. Building things that work hard and look harder.
+		</p>
+	</section>
+
+	<!-- Marquee -->
+	<section class="border-y border-[var(--color-border)] py-4 overflow-hidden">
+		<div class="flex whitespace-nowrap" style="animation: marquee 25s linear infinite;">
+			{[...skills, ...skills].map(skill => (
+				<span class="font-[family-name:var(--font-display)] text-4xl md:text-5xl tracking-wider mx-6 md:mx-8 text-[var(--color-text-muted)]">{skill}</span>
+			))}
+		</div>
+	</section>
+
+	<!-- Selected Work -->
+	<section class="max-w-6xl mx-auto px-6 py-16 md:py-24">
+		<h2 class="font-[family-name:var(--font-display)] text-5xl md:text-6xl tracking-wider mb-10">SELECTED WORK</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			{projects.map(project => (
+				<a href="#" class="group block border border-[var(--color-border)] rounded-lg p-6 md:p-8 transition-all duration-200 hover:border-[var(--color-accent)] hover:translate-y-[-2px] hover:shadow-[0_8px_30px_rgba(232,96,60,0.08)] cursor-pointer bg-[var(--color-surface)]">
+					<span class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors duration-150">{project.num}</span>
+					<h3 class="font-[family-name:var(--font-display)] text-3xl md:text-4xl tracking-wider mt-2 group-hover:text-[var(--color-accent)] transition-colors duration-150">{project.title}</h3>
+					<p class="text-sm text-[var(--color-text-muted)] mt-3 leading-relaxed">{project.description}</p>
+					<div class="flex gap-2 mt-4 flex-wrap">
+						{project.tags.map(tag => (
+							<span class="text-xs font-medium px-2.5 py-1 rounded-full border border-[var(--color-border)] text-[var(--color-text-muted)] group-hover:border-[var(--color-accent)] group-hover:text-[var(--color-accent)] transition-colors duration-150">{tag}</span>
+						))}
+					</div>
+				</a>
+			))}
+		</div>
+	</section>
+
+	<!-- Contact -->
+	<section class="bg-[var(--color-accent)] text-white">
+		<div class="max-w-6xl mx-auto px-6 py-12 md:py-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+			<div>
+				<h2 class="font-[family-name:var(--font-display)] text-5xl md:text-6xl tracking-wider">LET'S WORK</h2>
+				<p class="mt-2 text-white/70 text-sm">Open to collaborations and interesting projects.</p>
+			</div>
+			<a href="mailto:dylan@kuzmick.dev" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-6 py-3 font-medium transition-colors duration-150 cursor-pointer">
+				dylan@kuzmick.dev
+				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+			</a>
+		</div>
+	</section>
 </Base>
