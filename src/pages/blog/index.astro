@@ -2,38 +2,37 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 const posts = (await getCollection('blog')).sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
-const [featured] = posts;
+const [latest, ...rest] = posts;
 ---
 
 <Base title="Blog — Dylan Kuzmick">
-	<section class="max-w-6xl mx-auto px-6 pt-12 md:pt-20 pb-8">
-		<h1 class="font-display text-[clamp(3rem,8vw,7rem)] leading-[0.88] tracking-tight">
+	<!-- Header -->
+	<section class="max-w-6xl mx-auto px-6 pt-14 md:pt-24 pb-10 md:pb-14">
+		<h1 class="text-5xl md:text-7xl font-bold tracking-tight leading-[0.95]">
 			BL<span class="text-accent">O</span>G
 		</h1>
-		<p class="mt-4 text-text-muted text-lg">Thoughts, process, and technical deep-dives.</p>
+		<p class="mt-5 text-text-muted text-lg md:text-xl max-w-xl leading-relaxed">Thoughts, process, and technical deep-dives.</p>
 	</section>
 
-	<!-- Featured post -->
-	{featured && (
-		<section class="max-w-6xl mx-auto px-6 pb-10">
-			<a href={`/blog/${featured.id}`} class="group block">
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-					<div class="aspect-[16/10] bg-surface flex items-center justify-center overflow-hidden">
-						{featured.data.image ? (
-							<img src={featured.data.image} alt="" class="w-full h-full object-cover" />
-						) : (
-							<span class="text-text-muted text-sm opacity-40">Image</span>
-						)}
-					</div>
-					<div class="flex flex-col justify-center">
-						<h2 class="text-3xl md:text-4xl font-semibold group-hover:text-accent transition-colors duration-150">{featured.data.title}</h2>
-						<p class="text-text-muted mt-3 leading-relaxed">{featured.data.description}</p>
-						<div class="flex items-center gap-3 mt-4">
-							<span class="w-6 h-6 rounded-full bg-accent inline-block"></span>
-							<span class="text-sm text-text-muted">Dylan Kuzmick</span>
-							<span class="text-sm text-text-muted">&middot;</span>
-							<time class="text-sm text-text-muted">{featured.data.date}</time>
-						</div>
+	<!-- Latest post — featured layout -->
+	{latest && (
+		<section class="max-w-6xl mx-auto px-6 pb-14 md:pb-20">
+			<h2 class="font-mono text-sm uppercase tracking-[0.2em] text-text-muted mb-6 md:mb-8">Latest</h2>
+			<a href={`/blog/${latest.id}`} class="group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14 items-center">
+				<div class="aspect-[16/10] rounded-lg bg-surface overflow-hidden">
+					{latest.data.image ? (
+						<img src={latest.data.image} alt="" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+					) : (
+						<span class="sr-only">Post image</span>
+					)}
+				</div>
+				<div>
+					<h3 class="font-serif text-3xl md:text-4xl font-semibold tracking-tight group-hover:text-accent transition-colors duration-300 leading-tight">{latest.data.title}</h3>
+					<p class="text-text-muted mt-3 text-sm md:text-base leading-relaxed">{latest.data.description}</p>
+					<div class="flex items-center gap-3 mt-5 font-mono text-xs uppercase tracking-[0.08em] text-text-muted/60">
+						<time>{latest.data.date}</time>
+						<span class="w-1 h-1 rounded-full bg-text-muted/40"></span>
+						<span>Dylan Kuzmick</span>
 					</div>
 				</div>
 			</a>
@@ -42,27 +41,34 @@ const [featured] = posts;
 
 	<!-- Divider -->
 	<div class="max-w-6xl mx-auto px-6">
-		<hr class="border-border" />
+		<div class="border-t border-border/40"></div>
 	</div>
 
-	<!-- Latest label -->
-	<section class="max-w-6xl mx-auto px-6 pt-8 pb-6">
-		<h3 class="text-sm font-medium uppercase tracking-[0.15em] text-text-muted">Latest</h3>
-	</section>
-
-	<!-- Posts grid -->
-	<section class="max-w-6xl mx-auto px-6 pb-16">
+	<!-- More posts grid -->
+	<section class="max-w-6xl mx-auto px-6 pt-10 md:pt-14 pb-20 md:pb-28">
+		<h3 class="font-mono text-sm uppercase tracking-[0.2em] text-text-muted mb-8 md:mb-10">All Posts</h3>
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-			<div class="block">
-				<div class="aspect-[16/10] bg-surface flex items-center justify-center mb-4">
-					<span class="text-text-muted text-sm opacity-40">Image</span>
+			{rest.length > 0 ? rest.map(post => (
+				<a href={`/blog/${post.id}`} class="group block">
+					<div class="aspect-[16/10] rounded-xl bg-surface overflow-hidden mb-4">
+						{post.data.image ? (
+							<img src={post.data.image} alt="" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+						) : (
+							<span class="sr-only">Post image</span>
+						)}
+					</div>
+					<h4 class="text-base font-medium group-hover:text-accent transition-colors duration-200 leading-snug">{post.data.title}</h4>
+					<p class="text-sm text-text-muted/60 mt-1.5 line-clamp-2 leading-relaxed">{post.data.description}</p>
+					<time class="block mt-2 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted/40">{post.data.date}</time>
+				</a>
+			)) : (
+				<div class="block">
+					<div class="aspect-[16/10] rounded-xl bg-surface mb-4"></div>
+					<h4 class="font-medium text-base text-text-muted">Coming Soon</h4>
+					<p class="text-sm text-text-muted/60 mt-1.5 leading-relaxed">Stay tuned for more posts.</p>
+					<time class="block mt-2 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted/40">TBD</time>
 				</div>
-				<h3 class="font-semibold text-base leading-snug text-text-muted">Coming Soon</h3>
-				<p class="text-sm text-text-muted mt-1.5 leading-relaxed">Stay tuned for more posts.</p>
-				<div class="flex items-center gap-2 mt-3">
-					<span class="text-xs text-text-muted">TBD</span>
-				</div>
-			</div>
+			)}
 		</div>
 	</section>
 </Base>
