@@ -1,0 +1,163 @@
+---
+title: "Every Developer's Localhost Is Broken (And Linux Can Fix It)"
+date: "2026-02-14"
+description: "AI coding agents made parallel development possible. But your OS wasn't built for it. Here's how network namespaces can make working on three projects feel no different from working on one."
+image: "/blogs/hyprflow/spider-man-meme.webp"
+---
+
+# Every Developer's Localhost Is Broken (And Linux Can Fix It)
+
+Developers are eager to do more. AI agents finally make parallel work feel within reach. But try it, and the time spent juggling ports, tabs, and windows chips away at the productivity you hoped to gain. Port 3000 is already in use. Auth cookies bleed between projects. And nothing groups your tools by project.
+
+## The problem
+
+Theo's [_Agentic Coding Has A HUGE Problem_](https://www.youtube.com/watch?v=YVq28OTPCKw) video laid this out well and I'd recommend watching it if you haven't already. The short version: AI coding agents take long enough that you naturally start working on multiple projects at once, and they're good enough that you don't always need to babysit them. But the moment you start multitasking, everything slows down. This boils down to two problems:
+
+**Isolation.** Your projects share the same network. Two dev servers can't bind to the same port. Auth cookies for `localhost` bleed between projects. A database on `localhost:5432` belongs to whoever started it first.
+
+**Organization.** Nothing groups your tools by project. Terminal tabs, browser tabs, editor windows — they all live in one flat pile. You're the one mentally tracking which IDE is which project, which terminal is running which server, which browser tab goes with which editor. Eventually, you find it, then a notification pops up that Claude Code finished — but which project was that for again?
+
+Theo went through a lot of the usual suggestions — tmux, IDE built-in browsers, Docker, background agents — and none of them really help. Even if you haven't hit these problems yet, the friction is already shaping your behavior. You don't try to run three projects at once because you know it'll be a hassle.
+
+## What the ideal solution looks like
+
+Your workflow should encourage parallelism the same way a browser encourages multiple tabs — you should be able to have several projects open without disaster befalling you. Here's Theo's description of what's ideal for him:
+
+> _"My dream would be a very simple set of desktops that have their own logical consistent behaviors such that I could easily go between the three and have them set up perfectly. In my dream world, each of these would be a different remote computer that I'm controlling from here."_
+
+Let's take that seriously. What properties would the perfect setup have?
+
+1. **Each project gets its own `localhost`.** Two dev servers on port 3000 coexist without conflict. Auth redirects work. Cookies don't bleed.
+2. **Switching projects is instant.** One keybind, and your terminal, editor, browser — everything — is scoped to the right project.
+3. **No per-project configuration.** You don't rebuild your dev environment, rewrite your auth setup, or change ports just to work in parallel.
+4. **Your tools stay unified.** One browser with your bookmarks, passwords, and extensions. One clipboard. One set of files on one filesystem.
+
+The "different remote computer" framing gets at properties 1-3. If each project literally ran on a separate machine, ports and cookies are naturally isolated, and you'd switch between them like switching desktops.
+
+But actually using separate machines — or even VMs — fails on property 4. Your dev environment, bookmarks, and passwords don't sync. Copy-paste is flaky. Files live on different filesystems. And you're tripling your resource usage for the privilege of running three `localhost`s.
+
+So the real question becomes: can you get the isolation of separate computers with the convenience of operating just one?
+
+On Linux, the answer is yes.
+
+## Network namespaces (isolation)
+
+Linux has a feature called network namespaces. A network namespace gives a process its own isolated network stack — its own interfaces, its own routing table, its own ports. Two processes in different namespaces can both bind to port 3000 without conflict, because they're on different networks entirely.
+
+This is a kernel-level primitive, not a VM or container. It isolates the network and nothing else, which is exactly what we want. You can think of each namespace as a room with its own network. Creating one is a single command:
+
+```bash
+sudo ip netns add room1
+```
+
+But a room starts completely sealed off. It has its own localhost, sure, but it can't reach the internet. Your dev server needs the internet for APIs, databases, package registries.
+
+So you run a cable from each room back to the host machine. Linux lets you create a virtual cable — a "veth pair" (virtual ethernet) — with one plug in the room and one on the host:
+
+```bash
+# Make a cable with two ends
+sudo ip link add plug-host type veth peer name plug-room
+sudo ip link set plug-room netns room1
+
+# Give the host end an address
+sudo ip addr add 10.200.1.1/24 dev plug-host
+sudo ip link set plug-host up
+```
+
+Each room gets its own subnet (e.g. `10.200.1.0/24`). The host side of the cable is `10.200.1.1`, the room side is `10.200.1.2`.
+
+```bash
+# Give the room end an address
+sudo ip netns exec room1 ip addr add 10.200.1.2/24 dev plug-room
+sudo ip netns exec room1 ip link set plug-room up
+sudo ip netns exec room1 ip link set lo up
+```
+
+Now the room can talk to the host, but it still can't reach the internet. The room's address (`10.200.1.2`) is local, and nothing outside your machine can reply to it. The fix is to have the host rewrite each outgoing packet's source address to its own and tag it with a random ephemeral port so it knows where to route replies. Room 1's `10.200.1.2` becomes `192.168.1.100:48372`, Room 2's `10.200.2.2` becomes `192.168.1.100:48373`. This is called NAT, and it's the same thing your home router does for your local devices:
+
+```bash
+# Tell the room to send all external traffic through the host
+sudo ip netns exec room1 ip route add default via 10.200.1.1
+# Rewrite the room's local address to the host's address on the way out
+sudo iptables -t nat -A POSTROUTING -s 10.200.1.0/24 -j MASQUERADE
+```
+
+The end result:
+
+<img src="/blogs/hyprflow/namespace-end-result.svg" alt="Namespace end result diagram" style="max-width: 360px; margin: 1.5em auto; display: block;" />
+
+Both rooms have full internet and both use port 3000. They can't see each other. Any process you launch inside a room uses that room's network — your terminal (dev servers, Claude Code, etc.), your browser — all hit Room 1's localhost when launched in Room 1. And unlike VMs, everything outside the network is still shared (filesystem, clipboard, etc.).
+
+## Wiring this into a window manager (organization)
+
+Namespaces solve the isolation problem, but they're only half the answer. You still need a way to group your tools by project, switch between them instantly, and wire each group into the right namespace. You want to switch to a project and have everything just work.
+
+[Hyprflow](https://github.com/Dillpickleschmidt/hyprflow) wires network namespaces into Hyprland's workspace system by introducing **workspace groups**. Every 10 workspaces form a group (1-10 are Group 1, 11-20 are Group 2, 21-30 are Group 3), and each group shares one namespace.
+
+```
+Group 1 (chat app)             Group 2 (portfolio)           Group 3 (e-commerce site)
+┌────────────────────┐         ┌────────────────────┐        ┌────────────────────┐
+│  ws 1: terminal    │         │  ws 11: terminal   │        │  ws 21: terminal   │
+│  ws 2: editor      │         │  ws 12: editor     │        │  ws 22: editor     │
+│  ws 3: browser     │         │  ws 13: browser    │        │  ws 23: browser    │
+│                    │         │                    │        │                    │
+│  namespace: hyprns_1│        │  namespace: hyprns_2│       │  namespace: hyprns_3│
+└────────────────────┘         └────────────────────┘        └────────────────────┘
+```
+
+When Hyprland starts, Hyprflow launches a background process that watches for workspace changes. The first time you switch to a new group, it creates the namespace automatically. From there, any app you launch in that group enters its namespace. You never think about it.
+
+Say you're working on a chat app, a portfolio, and an e-commerce site. Each gets its own group. Your chat app runs on `localhost:3000` in Group 1, your portfolio also runs on `localhost:3000` in Group 2 without issue (no `localhost:3001` + auth redirects breaking). You switch between them with`SUPER+ALT+1`,`SUPER+ALT+2`,`SUPER+ALT+3`, analogous to switching between browser tabs.
+
+## Making it work in practice
+
+Namespaces handle most apps out of the box. But browsers and Docker don't fit neatly into this model, and getting cookies, localStorage, and container networking to cooperate takes more work.
+
+### Browsers
+
+Browsers are a special case. Chromium, Firefox, and everything built on them enforce a single-process model — when you open a new window, it doesn't start a fresh process. It connects to the browser that's already running. This means every browser window on your machine shares the same network stack, cookies, localStorage, and cache, regardless of which workspace it's on.
+
+It gets worse. Browsers treat all of `localhost` as a single origin — `localhost:3000` and `localhost:5432` share the same cookies, localStorage, IndexedDB, and Service Workers. Ports don't matter. So even if you could somehow put different browser windows in different namespaces, Group 1's auth tokens and Group 2's auth tokens would still collide because they're all just `localhost`.
+
+Hyprflow solves both problems at once using [firejail](https://github.com/netblue30/firejail), a Linux sandboxing tool that can launch a process inside a specific network namespace (among other things). Each group gets its own isolated browser process with its own profile directory:
+
+```
+firejail --noprofile --netns=hyprns_1 chromium --user-data-dir=~/.config/hyprflow/browsers/chromium-wg1
+```
+
+Separate process, separate namespace, separate storage. But a fresh browser profile is empty — no bookmarks, no saved passwords, no extensions. You'd be setting up your browser from scratch in every group. To avoid that, each group's profile is copied from your main profile on launch, with localhost-specific storage excluded to keep groups isolated.
+
+### Docker
+
+Docker presents yet another challenge. When you run `docker compose up` in your terminal, the command itself runs in your namespace, but it's just sending instructions to the Docker daemon — a system-level process that started at boot, long before any workspace context existed. The daemon is the one that actually creates and runs containers, and it has no idea which namespace you're in.
+
+Hyprflow handles this with a custom OCI runtime wrapper. OCI (Open Container Initiative) runtimes are what Docker uses under the hood to actually start containers — the default one is called `runc`. Hyprflow registers its own wrapper, `hypr-devns-runc`, as Docker's default runtime. When Docker creates a container, the wrapper intercepts the call, patches the container's config to join the active workspace group's network namespace, then hands off to the real `runc`.
+
+This means you keep a single Docker daemon with a shared image and build cache, but each group's containers are network-isolated. A `docker` wrapper also sets the Compose project name to include the group ID (`myapp-wg1`, `myapp-wg2`), so each group gets independent container sets. Port publishing is stripped since containers are already inside the namespace — publishing would expose ports globally and cause the same conflicts namespaces were meant to prevent.
+
+## Trade-offs
+
+There are some important caveats to be aware of:
+
+**Hyprland + Arch only.** This is built for a specific stack. It's not portable to macOS or Windows or GNOME or KDE. That's by design — the tight integration with Hyprland's IPC and workspace model is what makes the experience seamless.
+
+**Profile sync is one-directional.** Your main browser profile syncs into each group on launch, but not the other way. If you log into a new site inside a group's browser, that login won't persist — it'll be overwritten by your main profile on next launch. Do your non-localhost account management in your main browser.
+
+**Docker runtime wrapper is global.** Once installed, the OCI runtime wrapper intercepts all container creation on the machine, not just dev containers. You can always uninstall Hyprflow via `hyprflow-uninstall` and reboot if you have issues.
+
+**IPv6 disabled in namespaces.** Dev servers typically bind to `127.0.0.1`, but Chromium's built-in DNS resolves `localhost` to both `127.0.0.1` and `::1`. IPv6 is disabled inside namespaces to prevent connection failures. Apps that rely on IPv6-only networking won't work.
+
+## Putting it all together
+
+With all of this wired up, there are a couple of quality-of-life features for [Omarchy](https://github.com/basecamp/omarchy) users that tie the experience together.
+
+A notification proxy prepends the workspace number to every notification. When Claude Code finishes a task in Group 2, the notification says `[11] Task complete` — since Group 2 is workspaces 11-20, you know immediately which project it's from without hunting through tabs.
+
+A group overlay shows all active workspace groups and their windows at a glance. Hold `ALT` and you can see what's running across all your projects without leaving your current workspace.
+
+Waybar integration shows workspace slots for your current group and any groups that have open windows. Switch to Group 2 and waybar shows 11-15 alongside Group 1's 1-5. Empty groups are hidden.
+
+Once it's all wired up, working on three projects feels no different from working on one. Hyprflow is one answer to the parallel development problem, but every OS and desktop environment will require their own approach.
+
+<p style="text-align: center; font-size: 1.75em; margin-top: 2em; font-style: italic; font-weight: 500; font-family: var(--font-serif);">The way we build software has changed, and it's time for our tools to catch up.</p>
+

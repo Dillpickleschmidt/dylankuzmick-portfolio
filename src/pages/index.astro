@@ -1,68 +1,190 @@
 ---
 import Base from '../layouts/Base.astro';
-
-const skills = ['TypeScript', 'React', 'Node.js', 'Rust', 'PostgreSQL', 'Figma', 'AWS', 'Docker', 'GraphQL', 'Astro', 'Tailwind', 'Linux'];
+const skills = ['TypeScript', 'Rust', 'C++', 'Python', 'Node.js', 'React', 'SolidJS', 'Next.js', 'TanStack Start', 'Astro', 'Tailwind', 'Hono', 'Effect.ts', 'Tauri', 'PostgreSQL', 'OpenAI', 'Vercel AI SDK', 'AWS', 'Docker', 'Dokploy', 'Git', 'Linux', 'Figma'];
 
 const projects = [
 	{
-		num: '01',
-		title: 'VOID ENGINE',
-		description: 'Real-time 3D rendering engine built from scratch in Rust and WebGPU. Pushes pixels at 120fps with zero dependencies.',
-		tags: ['Rust', 'WebGPU', 'WASM'],
+		title: 'ACADEMIC READER',
+		description: 'PDF-to-readable-HTML converter with AI chat, TTS, and document embeddings. Monorepo with React frontend, Hono API, Convex backend, and GPU workers.',
+		tags: ['React', 'Hono', 'Effect.ts', 'Convex', 'AI'],
+		url: 'https://github.com/dillpickleschmidt-org/academic-reader',
+		featured: true,
+		gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
 	},
 	{
-		num: '02',
-		title: 'SIGNAL',
-		description: 'Multiplayer collaborative whiteboard for distributed teams. Real-time sync with conflict-free replicated data types.',
-		tags: ['TypeScript', 'CRDTs', 'WebSocket'],
+		title: 'NIHONGO NINJA',
+		description: 'Japanese language learning platform built with TanStack Start for immersive study through interactive lessons and spaced repetition.',
+		tags: ['TanStack Start', 'React', 'TypeScript'],
+		url: 'https://github.com/Dillpickleschmidt/nihongo-ninja-tanstack',
+		featured: true,
+		gradient: 'linear-gradient(135deg, #1a1a1a 0%, #2d1b2e 50%, #1a0a2e 100%)',
 	},
 	{
-		num: '03',
-		title: 'MONO CLI',
-		description: 'Opinionated monorepo toolchain. Dependency graph analysis, incremental builds, and smart task scheduling.',
-		tags: ['Go', 'DAG', 'CLI'],
+		title: 'Hyprflow',
+		description: 'Hyprland workflow tools: per-workspace network namespaces for isolated localhost and visual tab group overlay. Docker + browser integration.',
+		tags: ['Python', 'Shell', 'Hyprland', 'Docker'],
+		url: 'https://github.com/Dillpickleschmidt/hyprflow',
+		featured: false,
+		gradient: 'linear-gradient(135deg, #0a1a1a 0%, #0f2a2a 50%, #1a2a1a 100%)',
 	},
 	{
-		num: '04',
-		title: 'TERRAFORM',
-		description: 'Generative landscape art tool. Procedural terrain, erosion simulation, and biome painting in the browser.',
-		tags: ['Canvas', 'Perlin', 'React'],
+		title: 'Subtitle Filename Parser',
+		description: 'Rust CLI for organizing anime subtitle files and downloading missing subtitles via the Jimaku API. Docker Compose support.',
+		tags: ['Rust', 'CLI', 'Docker'],
+		url: 'https://github.com/Dillpickleschmidt/subtitle-filename-parser',
+		featured: false,
+		gradient: 'linear-gradient(135deg, #2a1a0a 0%, #1f1a0f 50%, #1a1a0a 100%)',
+	},
+	{
+		title: 'Unreal NIF Import',
+		description: 'Unreal Engine plugin for importing .nif files (NetImmerse/Gamebryo). Supports static meshes, textures, materials, and BSA extraction.',
+		tags: ['C++', 'Unreal Engine'],
+		url: 'https://github.com/Dillpickleschmidt/unreal-nifimport',
+		featured: false,
+		gradient: 'linear-gradient(135deg, #1a1a2a 0%, #1f1f30 50%, #2a2a3a 100%)',
+	},
+	{
+		title: 'Nihongo Ninja Extension',
+		description: 'Chrome extension for subtitle sentence mining from streaming video. Anki integration via AnkiConnect for flashcard export.',
+		tags: ['TypeScript', 'Chrome Extension'],
+		url: 'https://github.com/Dillpickleschmidt/nihongo-ninja-extension',
+		featured: false,
+		gradient: 'linear-gradient(135deg, #2e1a2e 0%, #1f0f2a 50%, #1a1a2e 100%)',
+	},
+	{
+		title: 'Immersive YouTube Theater',
+		description: 'YouTube theater mode browser extension for a distraction-free viewing experience.',
+		tags: ['TypeScript', 'Browser Extension'],
+		url: 'https://github.com/Dillpickleschmidt/immersive-youtube-theater',
+		featured: false,
+		gradient: 'linear-gradient(135deg, #1a0a0a 0%, #2a1515 50%, #2a1a1a 100%)',
 	},
 ];
+
+const featured = projects.filter(p => p.featured);
+const grid = projects.filter(p => !p.featured);
 ---
 
 <Base title="Dylan Kuzmick">
 	<!-- Hero -->
-	<section class="max-w-6xl mx-auto px-6 pt-20 pb-12 md:pt-32 md:pb-20">
-		<h1 class="font-[family-name:var(--font-display)] text-[clamp(4rem,14vw,10rem)] leading-[0.88] tracking-tight">
-			DYLAN<br/><span class="text-[var(--color-accent)]">KUZMICK</span>
-		</h1>
-		<p class="mt-6 text-lg md:text-xl text-[var(--color-text-muted)] max-w-xl leading-relaxed">
-			Full-stack developer and designer at the intersection of technology and expression. Building things that work hard and look harder.
-		</p>
-	</section>
-
-	<!-- Marquee -->
-	<section class="border-y border-[var(--color-border)] py-4 overflow-hidden">
-		<div class="flex whitespace-nowrap" style="animation: marquee 25s linear infinite;">
-			{[...skills, ...skills].map(skill => (
-				<span class="font-[family-name:var(--font-display)] text-4xl md:text-5xl tracking-wider mx-6 md:mx-8 text-[var(--color-text-muted)]">{skill}</span>
-			))}
+	<section class="relative min-h-[50vh] md:min-h-[65vh] flex items-end overflow-hidden">
+		<img
+			src="/dylan-hero.jpg"
+			alt="Dylan Kuzmick sitting on a bench in a garden"
+			class="hero-image absolute inset-0 w-full h-full object-cover object-center"
+		/>
+		<!-- Gradient overlay — theme-aware -->
+		<div class="absolute inset-0" style="background: linear-gradient(to right, var(--hero-overlay-from), var(--hero-overlay-via), transparent);"></div>
+		<div class="absolute inset-0" style="background: linear-gradient(to top, var(--hero-overlay-bottom), transparent, transparent);"></div>
+		<div class="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 pb-12 md:pb-16 w-full">
+			<h1 class="font-display text-[clamp(4rem,14vw,10rem)] leading-[0.88] tracking-tight" style="color: var(--hero-text);">
+				DYLAN<br/><span class="text-accent-secondary">KUZMICK</span>
+			</h1>
+			<p class="mt-6 text-lg md:text-xl max-w-xl leading-relaxed" style="color: var(--hero-text-muted);">
+				Full-stack developer and UVA CS grad. Every project I build starts with a real problem and ends with software people can actually use.
+			</p>
 		</div>
 	</section>
 
-	<!-- Selected Work -->
-	<section class="max-w-6xl mx-auto px-6 py-16 md:py-24">
-		<h2 class="font-[family-name:var(--font-display)] text-5xl md:text-6xl tracking-wider mb-10">SELECTED WORK</h2>
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			{projects.map(project => (
-				<a href="#" class="group block border border-[var(--color-border)] rounded-lg p-6 md:p-8 transition-all duration-200 hover:border-[var(--color-accent)] hover:translate-y-[-2px] hover:shadow-[0_8px_30px_rgba(232,96,60,0.08)] cursor-pointer bg-[var(--color-surface)]">
-					<span class="text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors duration-150">{project.num}</span>
-					<h3 class="font-[family-name:var(--font-display)] text-3xl md:text-4xl tracking-wider mt-2 group-hover:text-[var(--color-accent)] transition-colors duration-150">{project.title}</h3>
-					<p class="text-sm text-[var(--color-text-muted)] mt-3 leading-relaxed">{project.description}</p>
-					<div class="flex gap-2 mt-4 flex-wrap">
-						{project.tags.map(tag => (
-							<span class="text-xs font-medium px-2.5 py-1 rounded-full border border-[var(--color-border)] text-[var(--color-text-muted)] group-hover:border-[var(--color-accent)] group-hover:text-[var(--color-accent)] transition-colors duration-150">{tag}</span>
+	<!-- Marquee -->
+	<section class="border-y border-border py-4 overflow-hidden relative">
+		<!-- Fade masks on edges -->
+		<div class="pointer-events-none absolute inset-y-0 left-0 w-24 md:w-40 z-10" style="background: linear-gradient(to right, var(--color-bg), transparent);"></div>
+		<div class="pointer-events-none absolute inset-y-0 right-0 w-24 md:w-40 z-10" style="background: linear-gradient(to left, var(--color-bg), transparent);"></div>
+		<div id="marquee" class="flex items-center whitespace-nowrap will-change-transform">
+			{[...skills, ...skills].map((skill, i) => (
+				<>
+					{i > 0 && <span class="marquee-item font-body text-text-muted/25 text-lg mx-1 md:mx-2 select-none">&diams;</span>}
+					<span class="marquee-item font-body text-2xl md:text-3xl tracking-wide mx-4 md:mx-5 text-text-muted transition-all duration-500 ease-out">{skill}</span>
+				</>
+			))}
+		</div>
+	</section>
+	<script is:inline>
+		const el = document.getElementById('marquee');
+		const speed = 35;
+		let halfWidth = 0;
+		let offset = 0;
+		let last = 0;
+
+		function measure() { halfWidth = el.scrollWidth / 2; }
+		window.addEventListener('resize', measure);
+
+		const items = el.querySelectorAll('.marquee-item');
+		function updatePulse() {
+			const vw = window.innerWidth;
+			const center = vw / 2;
+			items.forEach(item => {
+				const rect = item.getBoundingClientRect();
+				const itemCenter = rect.left + rect.width / 2;
+				const dist = Math.abs(itemCenter - center) / (vw * 0.5);
+				const t = Math.max(0, 1 - dist);
+				const scale = 1 + t * 0.15;
+				const opacity = 0.45 + t * 0.55;
+				item.style.transform = `scale(${scale})`;
+				item.style.opacity = opacity;
+			});
+		}
+
+		function tick(now) {
+			if (!last) { last = now; measure(); }
+			const dt = (now - last) / 1000;
+			last = now;
+			if (halfWidth > 0) {
+				offset = (offset + speed * dt) % halfWidth;
+				el.style.transform = `translateX(-${offset}px)`;
+				updatePulse();
+			}
+			requestAnimationFrame(tick);
+		}
+		requestAnimationFrame(tick);
+	</script>
+
+	<!-- Featured Projects — alternating layout -->
+	<section class="max-w-6xl mx-auto px-6 pt-16 md:pt-20">
+		<h2 class="font-mono text-lg uppercase tracking-[0.2em] text-text-muted text-center mb-4 md:mb-6">Featured Projects</h2>
+		{featured.map((project, i) => (
+			<a href={project.url} target="_blank" rel="noopener noreferrer"
+				class={`group grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14 items-center py-12 md:py-16 reveal ${i > 0 ? 'border-t border-border/40' : ''}`}
+				style={`--reveal-delay: ${i * 100}ms`}>
+				<div class={`aspect-[16/9] rounded-2xl bg-surface overflow-hidden ${i % 2 !== 0 ? 'md:order-2' : ''}`}>
+					<span class="sr-only">Project preview</span>
+				</div>
+				<div class={i % 2 !== 0 ? 'md:order-1 md:text-right' : ''}>
+					<h3 class="text-2xl md:text-3xl font-semibold tracking-tight group-hover:text-accent transition-colors duration-300">{project.title}</h3>
+					<p class="mt-2 text-text-muted text-sm md:text-base leading-relaxed">{project.description}</p>
+					<div class={`flex items-center gap-2 mt-4 text-[12px] text-text-muted/50 ${i % 2 !== 0 ? 'md:justify-end' : ''}`}>
+						{project.tags.map((tag, j) => (
+							<>
+								{j > 0 && <span class="text-text-muted/20">&middot;</span>}
+								<span>{tag}</span>
+							</>
+						))}
+					</div>
+				</div>
+			</a>
+		))}
+	</section>
+
+	<!-- Other Projects — compact grid -->
+	<section class="max-w-6xl mx-auto px-6 pt-12 md:pt-16 pb-20 md:pb-28 reveal">
+		<h3 class="text-sm font-light uppercase tracking-[0.2em] text-text-muted mb-8 md:mb-10">More Projects</h3>
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+			{grid.map((project, i) => (
+				<a href={project.url} target="_blank" rel="noopener noreferrer"
+					class="group block reveal"
+					style={`--reveal-delay: ${i * 60}ms`}>
+					<div class="aspect-[16/10] rounded-xl bg-surface overflow-hidden mb-4">
+						<span class="sr-only">Project preview</span>
+					</div>
+					<h4 class="text-base font-medium group-hover:text-accent transition-colors duration-200">{project.title}</h4>
+					<p class="text-sm text-text-muted/60 mt-1 line-clamp-2 leading-relaxed">{project.description}</p>
+					<div class="flex items-center mt-2 gap-2 text-[11px] text-text-muted/40">
+						{project.tags.map((tag, j) => (
+							<>
+								{j > 0 && <span class="text-text-muted/15">&middot;</span>}
+								<span>{tag}</span>
+							</>
 						))}
 					</div>
 				</a>
@@ -71,16 +193,36 @@ const projects = [
 	</section>
 
 	<!-- Contact -->
-	<section class="bg-[var(--color-accent)] text-white">
-		<div class="max-w-6xl mx-auto px-6 py-12 md:py-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-			<div>
-				<h2 class="font-[family-name:var(--font-display)] text-5xl md:text-6xl tracking-wider">LET'S WORK</h2>
-				<p class="mt-2 text-white/70 text-sm">Open to collaborations and interesting projects.</p>
+	<section class="border-t border-border pt-14 pb-10 md:pt-20 md:pb-14 reveal">
+		<div class="max-w-6xl mx-auto px-6 text-center">
+			<h2 class="text-4xl md:text-6xl font-bold tracking-tight leading-[0.95]">
+				LET'S BUILD<br/>SOMETHING.
+			</h2>
+			<p class="mt-5 text-text-muted text-base md:text-lg max-w-md mx-auto leading-relaxed">
+				If you want to chat, build something, or just say hey — my inbox is open.
+			</p>
+			<div class="mt-6">
+				<a href="mailto:drkuzmick@gmail.com"
+					class="group inline-flex items-center gap-3 bg-accent/10 hover:bg-accent/[0.18] border border-accent/25 hover:border-accent/40 rounded-full px-7 py-3.5 text-accent font-medium transition-all duration-300">
+					drkuzmick@gmail.com
+					<svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+				</a>
 			</div>
-			<a href="mailto:dylan@kuzmick.dev" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-6 py-3 font-medium transition-colors duration-150 cursor-pointer">
-				dylan@kuzmick.dev
-				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-			</a>
 		</div>
 	</section>
+
+	<!-- Scroll reveal observer -->
+	<script is:inline>
+		const revealObserver = new IntersectionObserver((entries) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					const delay = getComputedStyle(entry.target).getPropertyValue('--reveal-delay') || '0ms';
+					entry.target.style.transitionDelay = delay;
+					entry.target.classList.add('revealed');
+					revealObserver.unobserve(entry.target);
+				}
+			});
+		}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+		document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+	</script>
 </Base>

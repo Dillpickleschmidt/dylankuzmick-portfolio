@@ -2,34 +2,35 @@
 
 @theme {
   --font-display: 'Bebas Neue', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
+  --font-body: 'Outfit Variable', sans-serif;
+  --font-mono: 'Azeret Mono Variable', monospace;
+  --font-serif: 'Times New Roman', Times, serif;
 
-/* Dark theme (default) */
-:root {
   --color-bg: #0f0f0f;
   --color-surface: #1a1a1a;
   --color-surface-hover: #242424;
   --color-text: #e8e8e8;
   --color-text-muted: #888888;
-  --color-accent: #e8603c;
-  --color-accent-hover: #f07050;
+
+  /* Primary accent - Green */
+  --color-accent: #4a9a6a;
+  --color-accent-hover: #5aaa7a;
+  --color-accent-dark: #2a5a3a;
+
+  /* Secondary accent - Orange */
+  --color-accent-secondary: #e8603c;
+  --color-accent-secondary-hover: #f07050;
+
   --color-border: #2a2a2a;
   --color-border-hover: #3a3a3a;
 }
 
-/* Light theme */
-.light {
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f0f0f0;
-  --color-text: #111111;
-  --color-text-muted: #666666;
-  --color-accent: #d4502c;
-  --color-accent-hover: #c04020;
-  --color-border: #e0e0e0;
-  --color-border-hover: #cccccc;
+:root {
+  --hero-overlay-from: rgba(0, 0, 0, 0.7);
+  --hero-overlay-via: rgba(0, 0, 0, 0.4);
+  --hero-overlay-bottom: rgba(0, 0, 0, 0.6);
+  --hero-text: #ffffff;
+  --hero-text-muted: rgba(255, 255, 255, 0.7);
 }
 
 html {
@@ -40,8 +41,7 @@ html {
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  transition: background-color 0.3s ease, color 0.3s ease;
-  min-height: 100vh;
+min-height: 100vh;
 }
 
 ::selection {
@@ -72,9 +72,7 @@ a {
 }
 
 .prose h1 {
-  font-family: var(--font-display);
   font-size: 2.5rem;
-  letter-spacing: 0.04em;
   line-height: 1;
   margin-top: 2.5em;
   margin-bottom: 0.5em;
@@ -82,9 +80,7 @@ a {
 }
 
 .prose h2 {
-  font-family: var(--font-display);
   font-size: 2rem;
-  letter-spacing: 0.04em;
   line-height: 1.1;
   margin-top: 2em;
   margin-bottom: 0.5em;
@@ -92,9 +88,7 @@ a {
 }
 
 .prose h3 {
-  font-family: var(--font-display);
   font-size: 1.5rem;
-  letter-spacing: 0.04em;
   line-height: 1.2;
   margin-top: 1.8em;
   margin-bottom: 0.5em;
@@ -137,8 +131,9 @@ a {
 }
 
 .prose code {
-  font-family: var(--font-mono);
-  font-size: 0.875em;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+  font-size: 0.85em;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 4px;
@@ -146,7 +141,8 @@ a {
 }
 
 .prose pre {
-  font-family: var(--font-mono);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
   font-size: 0.875rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -183,4 +179,17 @@ a {
 /* First heading in blog content — hide it since we render the title in the header */
 .prose > h1:first-child {
   display: none;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
