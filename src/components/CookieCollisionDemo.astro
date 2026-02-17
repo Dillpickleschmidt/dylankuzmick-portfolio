@@ -6,11 +6,11 @@
     <!-- Chat App panel -->
     <div class="cd-panel" id="p-chat" data-accent="green">
       <div class="cd-chrome">
-        <div class="cd-dots"><i></i><i></i><i></i></div>
         <div class="cd-url-bar">
           <svg class="cd-lock" viewBox="0 0 12 14" fill="currentColor"><path d="M10 5V4a4 4 0 0 0-8 0v1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM4 4a2 2 0 1 1 4 0v1H4V4Z" opacity=".45"/></svg>
           <span>localhost:3000</span>
         </div>
+        <span class="cd-close">&times;</span>
       </div>
       <div class="cd-body" id="body-chat">
         <span class="cd-app-tag">Chat App</span>
@@ -28,11 +28,11 @@
     <!-- Portfolio panel -->
     <div class="cd-panel" id="p-port" data-accent="orange">
       <div class="cd-chrome">
-        <div class="cd-dots"><i></i><i></i><i></i></div>
         <div class="cd-url-bar">
           <svg class="cd-lock" viewBox="0 0 12 14" fill="currentColor"><path d="M10 5V4a4 4 0 0 0-8 0v1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM4 4a2 2 0 1 1 4 0v1H4V4Z" opacity=".45"/></svg>
           <span>localhost:5173</span>
         </div>
+        <span class="cd-close">&times;</span>
       </div>
       <div class="cd-body" id="body-port">
         <span class="cd-app-tag">Portfolio</span>
@@ -115,21 +115,14 @@
     border-bottom: 1px solid var(--color-border);
   }
 
-  .cd-dots {
-    display: flex;
-    gap: 5px;
+  .cd-close {
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    flex-shrink: 0;
+    cursor: default;
   }
-
-  .cd-dots i {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    display: block;
-  }
-
-  .cd-dots i:nth-child(1) { background: #e05050; }
-  .cd-dots i:nth-child(2) { background: #e0b040; }
-  .cd-dots i:nth-child(3) { background: #4a9a6a; }
 
   .cd-url-bar {
     flex: 1;
