@@ -6,6 +6,7 @@ image: "/blogs/hyprflow/spider-man-meme.webp"
 ---
 
 import CookieCollisionDemo from '../../components/CookieCollisionDemo.astro';
+import NamespaceDiagram from '../../components/NamespaceDiagram.astro';
 
 # Every Developer's Localhost Is Broken (And Linux Can Fix It)
 
@@ -88,7 +89,7 @@ sudo iptables -t nat -A POSTROUTING -s 10.200.1.0/24 -j MASQUERADE
 
 The end result:
 
-<img src="/blogs/hyprflow/namespace-end-result.svg" alt="Namespace end result diagram" style="max-width: 360px; margin: 1.5em auto; display: block;" />
+<NamespaceDiagram />
 
 Both rooms have full internet and both use port 3000. They can't see each other. Any process you launch inside a room uses that room's network — your terminal (dev servers, Claude Code, etc.), your browser — all hit Room 1's localhost when launched in Room 1. And unlike VMs, everything outside the network is still shared (filesystem, clipboard, etc.).
 
