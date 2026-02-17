@@ -7,6 +7,7 @@
 
 import "../styles/glitch.css";
 import { glitchOnce } from "./glitch";
+import { cameraShake } from "./camera-shake";
 
 // ---------------------------------------------------------------------------
 // Typewriter
@@ -178,6 +179,9 @@ function scrollReveal(config: ScrollRevealConfig) {
 // ---------------------------------------------------------------------------
 
 export function initAnimations() {
+  const heroImage = document.querySelector<HTMLElement>(".hero-image");
+  if (heroImage) cameraShake(heroImage);
+
   const heroSpark = document.querySelector<HTMLElement>("#hero-spark");
 
   typewriter({
