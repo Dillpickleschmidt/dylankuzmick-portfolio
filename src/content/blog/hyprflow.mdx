@@ -7,6 +7,7 @@ image: "/blogs/hyprflow/spider-man-meme.webp"
 
 import CookieCollisionDemo from '../../components/CookieCollisionDemo.astro';
 import NamespaceDiagram from '../../components/NamespaceDiagram.astro';
+import WorkspaceDiagram from '../../components/WorkspaceDiagram.astro';
 
 # Every Developer's Localhost Is Broken (And Linux Can Fix It)
 
@@ -99,16 +100,7 @@ Namespaces solve the isolation problem, but they're only half the answer. You st
 
 [Hyprflow](https://github.com/Dillpickleschmidt/hyprflow) wires network namespaces into Hyprland's workspace system by introducing **workspace groups**. Every 10 workspaces form a group (1-10 are Group 1, 11-20 are Group 2, 21-30 are Group 3), and each group shares one namespace.
 
-```
-Group 1 (chat app)             Group 2 (portfolio)           Group 3 (e-commerce site)
-┌────────────────────┐         ┌────────────────────┐        ┌────────────────────┐
-│  ws 1: terminal    │         │  ws 11: terminal   │        │  ws 21: terminal   │
-│  ws 2: editor      │         │  ws 12: editor     │        │  ws 22: editor     │
-│  ws 3: browser     │         │  ws 13: browser    │        │  ws 23: browser    │
-│                    │         │                    │        │                    │
-│  namespace: hyprns_1│        │  namespace: hyprns_2│       │  namespace: hyprns_3│
-└────────────────────┘         └────────────────────┘        └────────────────────┘
-```
+<WorkspaceDiagram />
 
 When Hyprland starts, Hyprflow launches a background process that watches for workspace changes. The first time you switch to a new group, it creates the namespace automatically. From there, any app you launch in that group enters its namespace. You never think about it.
 

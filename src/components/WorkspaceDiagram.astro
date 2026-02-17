@@ -1,0 +1,567 @@
+---
+---
+
+<div class="wd not-prose" data-active-group="1" data-active-ws="terminal">
+  <!-- Group headers -->
+  <div class="wd-groups">
+    <div class="wd-group" data-group="1">
+      <span class="wd-group-label wd-green">Group 1: <strong>Chat App</strong></span>
+      <div class="wd-tabs">
+        <button type="button" class="wd-tab" data-group="1" data-ws="terminal">1</button>
+        <button type="button" class="wd-tab" data-group="1" data-ws="editor">2</button>
+        <button type="button" class="wd-tab" data-group="1" data-ws="browser">3</button>
+      </div>
+    </div>
+    <div class="wd-group" data-group="2">
+      <span class="wd-group-label wd-orange">Group 2: <strong>Portfolio</strong></span>
+      <div class="wd-tabs">
+        <button type="button" class="wd-tab" data-group="2" data-ws="terminal">11</button>
+        <button type="button" class="wd-tab" data-group="2" data-ws="editor">12</button>
+        <button type="button" class="wd-tab" data-group="2" data-ws="browser">13</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared view panel -->
+  <div class="wd-panel">
+    <!-- Group 1 Terminal -->
+    <div class="wd-view" data-view="1-terminal">
+      <div class="wd-term">
+        <span class="wd-prompt wd-green">[hyprns_1]</span> <span class="wd-cmd">$ npm run dev</span>
+        <br/>
+        <span class="wd-output">
+          <span class="wd-dim">&gt; chat-app@1.0.0 dev</span>
+          <br/>
+          <span class="wd-dim">&gt; next dev</span>
+          <br/><br/>
+          <span class="wd-ready">&#x25cf;</span> ready on <span class="wd-url">localhost:3000</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Group 1 Editor -->
+    <div class="wd-view" data-view="1-editor">
+      <div class="wd-editor">
+        <div class="wd-editor-tab">
+          <span class="wd-editor-icon">&#x25cb;</span> chat-app/src/index.ts
+        </div>
+        <div class="wd-code">
+          <div class="wd-line"><span class="wd-ln">1</span><span class="wd-kw">import</span> {"{"} serve {"}"} <span class="wd-kw">from</span> <span class="wd-str">"./server"</span>;</div>
+          <div class="wd-line"><span class="wd-ln">2</span></div>
+          <div class="wd-line"><span class="wd-ln">3</span><span class="wd-kw">const</span> app = <span class="wd-fn">createApp</span>();</div>
+          <div class="wd-line"><span class="wd-ln">4</span>app.<span class="wd-fn">use</span>(<span class="wd-str">"/api/messages"</span>, router);</div>
+          <div class="wd-line"><span class="wd-ln">5</span></div>
+          <div class="wd-line"><span class="wd-ln">6</span><span class="wd-fn">serve</span>(app, {"{"} <span class="wd-prop">port</span>: <span class="wd-num">3000</span> {"}"});</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group 1 Browser -->
+    <div class="wd-view" data-view="1-browser">
+      <div class="wd-browser">
+        <div class="wd-chrome">
+          <div class="wd-url-bar">
+            <svg class="wd-lock" viewBox="0 0 12 14" fill="currentColor"><path d="M10 5V4a4 4 0 0 0-8 0v1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM4 4a2 2 0 1 1 4 0v1H4V4Z" opacity=".45"/></svg>
+            <span>localhost:3000</span>
+          </div>
+          <span class="wd-close">&times;</span>
+        </div>
+        <div class="wd-page wd-page-green">
+          <span class="wd-page-tag">Chat App</span>
+          <div class="wd-page-content">
+            <div class="wd-chat-bubble wd-chat-left">Hey, how's it going?</div>
+            <div class="wd-chat-bubble wd-chat-right">Working on the new feature!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group 2 Terminal -->
+    <div class="wd-view" data-view="2-terminal">
+      <div class="wd-term">
+        <span class="wd-prompt wd-orange">[hyprns_2]</span> <span class="wd-cmd">$ npm run dev</span>
+        <br/>
+        <span class="wd-output">
+          <span class="wd-dim">&gt; portfolio@1.0.0 dev</span>
+          <br/>
+          <span class="wd-dim">&gt; astro dev</span>
+          <br/><br/>
+          <span class="wd-ready">&#x25cf;</span> ready on <span class="wd-url">localhost:3000</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Group 2 Editor -->
+    <div class="wd-view" data-view="2-editor">
+      <div class="wd-editor">
+        <div class="wd-editor-tab">
+          <span class="wd-editor-icon">&#x25cb;</span> portfolio/src/index.ts
+        </div>
+        <div class="wd-code">
+          <div class="wd-line"><span class="wd-ln">1</span><span class="wd-kw">import</span> {"{"} defineConfig {"}"} <span class="wd-kw">from</span> <span class="wd-str">"astro/config"</span>;</div>
+          <div class="wd-line"><span class="wd-ln">2</span></div>
+          <div class="wd-line"><span class="wd-ln">3</span><span class="wd-kw">export default</span> <span class="wd-fn">defineConfig</span>({"{"}</div>
+          <div class="wd-line"><span class="wd-ln">4</span>  <span class="wd-prop">site</span>: <span class="wd-str">"https://dylan.dev"</span>,</div>
+          <div class="wd-line"><span class="wd-ln">5</span>  <span class="wd-prop">server</span>: {"{"} <span class="wd-prop">port</span>: <span class="wd-num">3000</span> {"}"},</div>
+          <div class="wd-line"><span class="wd-ln">6</span>{"}"});</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group 2 Browser -->
+    <div class="wd-view" data-view="2-browser">
+      <div class="wd-browser">
+        <div class="wd-chrome">
+          <div class="wd-url-bar">
+            <svg class="wd-lock" viewBox="0 0 12 14" fill="currentColor"><path d="M10 5V4a4 4 0 0 0-8 0v1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM4 4a2 2 0 1 1 4 0v1H4V4Z" opacity=".45"/></svg>
+            <span>localhost:3000</span>
+          </div>
+          <span class="wd-close">&times;</span>
+        </div>
+        <div class="wd-page wd-page-orange">
+          <span class="wd-page-tag">Portfolio</span>
+          <div class="wd-page-content">
+            <div class="wd-portfolio-card"></div>
+            <div class="wd-portfolio-card wd-portfolio-card-sm"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Namespace indicator -->
+  <div class="wd-indicator">
+    <div class="wd-ns-bar" data-indicator="1">
+      <span class="wd-ns-name wd-green">hyprns_1</span>
+      <span class="wd-ns-sep">&middot;</span>
+      <span class="wd-ns-port">localhost:3000</span>
+    </div>
+    <div class="wd-ns-bar" data-indicator="2">
+      <span class="wd-ns-name wd-orange">hyprns_2</span>
+      <span class="wd-ns-sep">&middot;</span>
+      <span class="wd-ns-port">localhost:3000</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wd {
+    --green: #4a9a6a;
+    --green-dim: rgba(74, 154, 106, 0.12);
+    --orange: #e8603c;
+    --orange-dim: rgba(232, 96, 60, 0.12);
+    --chrome: #161616;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    margin: 2.25em 0;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  .wd-green { color: var(--green); }
+  .wd-orange { color: var(--orange); }
+
+  /* ---- Group headers ---- */
+  .wd-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .wd-group {
+    padding: 12px 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.2s var(--ease);
+  }
+
+  .wd-group[data-group="1"] {
+    border-right: 1px solid var(--color-border);
+  }
+
+  .wd[data-active-group="1"] .wd-group[data-group="1"] {
+    background: var(--green-dim);
+  }
+
+  .wd[data-active-group="2"] .wd-group[data-group="2"] {
+    background: var(--orange-dim);
+  }
+
+  .wd-group-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+    transition: opacity 0.2s var(--ease);
+  }
+
+  .wd[data-active-group="1"] .wd-group[data-group="1"] .wd-group-label,
+  .wd[data-active-group="2"] .wd-group[data-group="2"] .wd-group-label {
+    opacity: 1;
+  }
+
+  .wd-group-label strong {
+    font-weight: 600;
+  }
+
+  .wd-tabs {
+    display: flex;
+    gap: 4px;
+  }
+
+  .wd-tab {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.15s var(--ease);
+    white-space: nowrap;
+  }
+
+  .wd-tab:hover {
+    border-color: var(--color-text-muted);
+    color: var(--color-text);
+  }
+
+  /* Active tab for group 1 */
+  .wd[data-active-group="1"][data-active-ws="terminal"] .wd-tab[data-group="1"][data-ws="terminal"],
+  .wd[data-active-group="1"][data-active-ws="editor"] .wd-tab[data-group="1"][data-ws="editor"],
+  .wd[data-active-group="1"][data-active-ws="browser"] .wd-tab[data-group="1"][data-ws="browser"] {
+    background: var(--green);
+    border-color: var(--green);
+    color: #0f0f0f;
+    font-weight: 600;
+  }
+
+  /* Active tab for group 2 */
+  .wd[data-active-group="2"][data-active-ws="terminal"] .wd-tab[data-group="2"][data-ws="terminal"],
+  .wd[data-active-group="2"][data-active-ws="editor"] .wd-tab[data-group="2"][data-ws="editor"],
+  .wd[data-active-group="2"][data-active-ws="browser"] .wd-tab[data-group="2"][data-ws="browser"] {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #0f0f0f;
+    font-weight: 600;
+  }
+
+  /* ---- View panel ---- */
+  .wd-panel {
+    position: relative;
+    min-height: 160px;
+    overflow: hidden;
+  }
+
+  .wd-view {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease);
+    pointer-events: none;
+  }
+
+  /* Show active view */
+  .wd[data-active-group="1"][data-active-ws="terminal"] [data-view="1-terminal"],
+  .wd[data-active-group="1"][data-active-ws="editor"] [data-view="1-editor"],
+  .wd[data-active-group="1"][data-active-ws="browser"] [data-view="1-browser"],
+  .wd[data-active-group="2"][data-active-ws="terminal"] [data-view="2-terminal"],
+  .wd[data-active-group="2"][data-active-ws="editor"] [data-view="2-editor"],
+  .wd[data-active-group="2"][data-active-ws="browser"] [data-view="2-browser"] {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ---- Terminal view ---- */
+  .wd-term {
+    padding: 14px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+
+  .wd-prompt {
+    font-weight: 600;
+  }
+
+  .wd-cmd {
+    color: var(--color-text);
+  }
+
+  .wd-output {
+    color: var(--color-text-muted);
+  }
+
+  .wd-dim {
+    opacity: 0.45;
+  }
+
+  .wd-ready {
+    color: var(--green);
+  }
+
+  .wd-url {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  /* ---- Editor view ---- */
+  .wd-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .wd-editor-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .wd-editor-icon {
+    font-size: 0.6rem;
+    opacity: 0.5;
+  }
+
+  .wd-code {
+    padding: 10px 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.7;
+  }
+
+  .wd-line {
+    padding: 0 14px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .wd-ln {
+    display: inline-block;
+    width: 20px;
+    text-align: right;
+    margin-right: 14px;
+    color: var(--color-text-muted);
+    opacity: 0.3;
+    user-select: none;
+  }
+
+  .wd-kw { color: #c586c0; }
+  .wd-str { color: #ce9178; }
+  .wd-fn { color: #dcdcaa; }
+  .wd-prop { color: #9cdcfe; }
+  .wd-num { color: #b5cea8; }
+
+  /* ---- Browser view ---- */
+  .wd-browser {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .wd-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--chrome);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .wd-url-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 3px 8px;
+  }
+
+  .wd-lock {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  .wd-close {
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    flex-shrink: 0;
+    cursor: default;
+  }
+
+  .wd-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 16px;
+  }
+
+  .wd-page-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .wd-page-green .wd-page-tag { color: var(--green); }
+  .wd-page-orange .wd-page-tag { color: var(--orange); }
+
+  .wd-page-content {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* Chat bubbles for group 1 browser */
+  .wd-chat-bubble {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    max-width: 80%;
+    color: var(--color-text);
+  }
+
+  .wd-chat-left {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--color-border);
+    margin-right: auto;
+  }
+
+  .wd-chat-right {
+    background: var(--green-dim);
+    border: 1px solid rgba(74, 154, 106, 0.25);
+    margin-left: auto;
+  }
+
+  /* Portfolio cards for group 2 browser */
+  .wd-portfolio-card {
+    height: 24px;
+    border-radius: 4px;
+    background: var(--orange-dim);
+    border: 1px solid rgba(232, 96, 60, 0.2);
+    margin-bottom: 6px;
+  }
+
+  .wd-portfolio-card-sm {
+    width: 60%;
+  }
+
+  /* ---- Namespace indicator ---- */
+  .wd-indicator {
+    position: relative;
+    border-top: 1px solid var(--color-border);
+    background: var(--chrome);
+    min-height: 32px;
+    overflow: hidden;
+  }
+
+  .wd-ns-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease);
+  }
+
+  .wd[data-active-group="1"] [data-indicator="1"],
+  .wd[data-active-group="2"] [data-indicator="2"] {
+    opacity: 1;
+  }
+
+  .wd-ns-name {
+    font-weight: 600;
+  }
+
+  .wd-ns-sep {
+    color: var(--color-text-muted);
+    opacity: 0.3;
+  }
+
+  .wd-ns-port {
+    color: var(--color-text-muted);
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 520px) {
+    .wd-groups {
+      grid-template-columns: 1fr;
+    }
+
+    .wd-group[data-group="1"] {
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .wd-tab {
+      font-size: 0.65rem;
+      padding: 3px 7px;
+    }
+
+    .wd-ns-bar {
+      flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector('.wd') as HTMLElement;
+  const tabs = root.querySelectorAll('.wd-tab') as NodeListOf<HTMLButtonElement>;
+  const groups = root.querySelectorAll('.wd-group') as NodeListOf<HTMLElement>;
+
+  const lastWs: Record<string, string> = { '1': 'terminal', '2': 'terminal' };
+
+  function setView(group: string, ws: string) {
+    lastWs[group] = ws;
+    root.dataset.activeGroup = group;
+    root.dataset.activeWs = ws;
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setView(tab.dataset.group!, tab.dataset.ws!);
+    });
+  });
+
+  groups.forEach(group => {
+    group.addEventListener('click', () => {
+      const g = group.dataset.group!;
+      setView(g, lastWs[g]);
+    });
+  });
+</script>
