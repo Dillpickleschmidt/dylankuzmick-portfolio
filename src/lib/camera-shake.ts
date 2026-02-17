@@ -26,8 +26,8 @@ export function cameraShake(
   config: CameraShakeConfig = {},
 ): () => void {
   const {
-    amplitude = 4,
-    speed = 1,
+    amplitude = 6,
+    speed = 0.75,
     layers: layerCount = 4,
   } = config;
 

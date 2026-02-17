@@ -70,76 +70,6 @@ function typewriter(config: TypewriterConfig) {
 }
 
 // ---------------------------------------------------------------------------
-// Marquee with center-pulse
-// ---------------------------------------------------------------------------
-
-interface MarqueeConfig {
-  /** Selector for the scrolling container */
-  containerSelector: string;
-  /** Selector for individual items that receive the pulse effect */
-  itemSelector: string;
-  /** Scroll speed in pixels per second */
-  speed: number;
-  /** Max scale multiplier at center (e.g. 0.15 = up to 1.15x) */
-  pulseScale: number;
-  /** Opacity range [min, max] — interpolated based on distance from center */
-  pulseOpacity: [min: number, max: number];
-}
-
-function marquee(config: MarqueeConfig) {
-  const container = document.querySelector<HTMLElement>(config.containerSelector);
-  if (!container) return () => {};
-
-  const items = container.querySelectorAll<HTMLElement>(config.itemSelector);
-  let halfWidth = 0;
-  let offset = 0;
-  let lastTime = 0;
-  let frameId: number;
-
-  function measure() {
-    halfWidth = container.scrollWidth / 2;
-  }
-
-  function updatePulse() {
-    const vw = window.innerWidth;
-    const center = vw / 2;
-    const [minOpacity, maxOpacity] = config.pulseOpacity;
-
-    items.forEach((item) => {
-      const rect = item.getBoundingClientRect();
-      const itemCenter = rect.left + rect.width / 2;
-      const proximity = Math.max(0, 1 - Math.abs(itemCenter - center) / (vw * 0.5));
-      item.style.transform = `scale(${1 + proximity * config.pulseScale})`;
-      item.style.opacity = String(minOpacity + proximity * (maxOpacity - minOpacity));
-    });
-  }
-
-  function tick(now: number) {
-    if (!lastTime) {
-      lastTime = now;
-      measure();
-    }
-    const dt = (now - lastTime) / 1000;
-    lastTime = now;
-
-    if (halfWidth > 0) {
-      offset = (offset + config.speed * dt) % halfWidth;
-      container.style.transform = `translateX(-${offset}px)`;
-      updatePulse();
-    }
-    frameId = requestAnimationFrame(tick);
-  }
-
-  window.addEventListener("resize", measure);
-  frameId = requestAnimationFrame(tick);
-
-  return () => {
-    cancelAnimationFrame(frameId);
-    window.removeEventListener("resize", measure);
-  };
-}
-
-// ---------------------------------------------------------------------------
 // Scroll Reveal
 // ---------------------------------------------------------------------------
 
@@ -198,14 +128,6 @@ export function initAnimations() {
     onComplete: () => {
       if (heroSpark) glitchOnce(heroSpark, { duration: 400, intensity: 0.5 });
     },
-  });
-
-  marquee({
-    containerSelector: "#marquee",
-    itemSelector: ".marquee-item",
-    speed: 35,
-    pulseScale: 0.15,
-    pulseOpacity: [0.45, 1],
   });
 
   scrollReveal({

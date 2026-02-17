@@ -1,6 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
-const skills = ['TypeScript', 'Rust', 'C++', 'Python', 'Node.js', 'React', 'SolidJS', 'Next.js', 'TanStack Start', 'Astro', 'Tailwind', 'Hono', 'Effect.ts', 'Tauri', 'PostgreSQL', 'OpenAI', 'Vercel AI SDK', 'AWS', 'Docker', 'Dokploy', 'Git', 'Linux', 'Figma'];
+const skillGroups = [
+	{
+		label: 'Languages',
+		skills: ['TypeScript', 'Rust', 'C++', 'Python'],
+	},
+	{
+		label: 'Frontend',
+		skills: ['React', 'SolidJS', 'Next.js', 'TanStack Start', 'Astro'],
+	},
+	{
+		label: 'Backend',
+		skills: ['Node.js', 'Hono', 'Effect.ts', 'Convex', 'SQL', 'OpenAI', 'Vercel AI SDK'],
+	},
+	{
+		label: 'Infrastructure',
+		skills: ['AWS', 'Docker', 'Dokploy', 'Tauri', 'OpenTelemetry', 'Git', 'Linux'],
+	},
+];
 
 const projects = [
 	{
@@ -86,17 +103,23 @@ const grid = projects.filter(p => !p.featured);
 		</div>
 	</section>
 
-	<!-- Marquee -->
-	<section class="border-y border-border py-4 overflow-hidden relative">
-		<!-- Fade masks on edges -->
-		<div class="pointer-events-none absolute inset-y-0 left-0 w-24 md:w-40 z-10" style="background: linear-gradient(to right, var(--color-bg), transparent);"></div>
-		<div class="pointer-events-none absolute inset-y-0 right-0 w-24 md:w-40 z-10" style="background: linear-gradient(to left, var(--color-bg), transparent);"></div>
-		<div id="marquee" class="flex items-center whitespace-nowrap will-change-transform">
-			{[...skills, ...skills].map((skill, i) => (
-				<>
-					{i > 0 && <span class="marquee-item font-body text-text-muted/25 text-lg mx-1 md:mx-2 select-none">&diams;</span>}
-					<span class="marquee-item font-body text-2xl md:text-3xl tracking-wide mx-4 md:mx-5 text-text-muted transition-all duration-500 ease-out">{skill}</span>
-				</>
+	<!-- Skills -->
+	<section class="border-y border-border py-10 md:py-14">
+		<div class="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+			{skillGroups.map((group, gi) => (
+				<div class="skill-fade-in" style={`animation-delay: ${gi * 120}ms`}>
+					<div class="mb-4 md:mb-5 border-t-2 border-border-hover">
+						<span class="inline-block font-mono text-[10px] md:text-[11px] uppercase tracking-[0.2em] mt-3 md:mt-4 text-text-muted">{group.label}</span>
+					</div>
+					<ul class="space-y-1.5 md:space-y-2">
+						{group.skills.map((skill, si) => (
+							<li
+								class="skill-item skill-fade-in font-body text-base md:text-lg text-text-muted/70 transition-colors duration-200"
+								style={`animation-delay: ${gi * 120 + (si + 1) * 50}ms`}
+							>{skill}</li>
+						))}
+					</ul>
+				</div>
 			))}
 		</div>
 	</section>
