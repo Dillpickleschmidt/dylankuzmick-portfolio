@@ -5,6 +5,9 @@
  * and returns a cleanup function (for future SPA use if needed).
  */
 
+import "../styles/glitch.css";
+import { glitchOnce } from "./glitch";
+
 // ---------------------------------------------------------------------------
 // Typewriter
 // ---------------------------------------------------------------------------
@@ -28,6 +31,8 @@ interface TypewriterConfig {
   slowdown: [remaining: number, base: number, jitter: number][];
   /** Delay before hiding cursor after typing completes (ms) */
   cursorLingerDelay: number;
+  /** Called after typing completes and cursor hides */
+  onComplete?: () => void;
 }
 
 function typewriter(config: TypewriterConfig) {
@@ -52,54 +57,14 @@ function typewriter(config: TypewriterConfig) {
       index++;
       timer = setTimeout(step, delayForPosition());
     } else {
-      timer = setTimeout(() => cursor.classList.add("done"), config.cursorLingerDelay);
+      timer = setTimeout(() => {
+        cursor.classList.add("done");
+        config.onComplete?.();
+      }, config.cursorLingerDelay);
     }
   }
 
   timer = setTimeout(step, config.startDelay);
-  return () => clearTimeout(timer);
-}
-
-// ---------------------------------------------------------------------------
-// Random Drift
-// ---------------------------------------------------------------------------
-
-interface DriftConfig {
-  /** Selectors for the two elements that drift in opposite directions */
-  selectors: [string, string];
-  /** Probability (0–1) of staying still on a given tick */
-  stillChance: number;
-  /** Min/max displacement (px) — picks a random value in this range */
-  displacement: [min: number, max: number];
-  /** Min/max interval between drift ticks (ms) */
-  interval: [min: number, max: number];
-  /** Delay before first drift (ms) */
-  startDelay: number;
-}
-
-function randomDrift(config: DriftConfig) {
-  const [elA, elB] = config.selectors.map((s) => document.querySelector<HTMLElement>(s));
-  if (!elA || !elB) return () => {};
-
-  let timer: ReturnType<typeof setTimeout>;
-
-  function tick() {
-    const shouldStay = Math.random() < config.stillChance;
-    if (shouldStay) {
-      elA.style.transform = "translateX(0)";
-      elB.style.transform = "translateX(0)";
-    } else {
-      const sign = Math.random() < 0.5 ? -1 : 1;
-      const [min, max] = config.displacement;
-      const dx = sign * (min + Math.random() * (max - min));
-      elA.style.transform = `translateX(${-dx}px)`;
-      elB.style.transform = `translateX(${dx}px)`;
-    }
-    const [minInt, maxInt] = config.interval;
-    timer = setTimeout(tick, minInt + Math.random() * (maxInt - minInt));
-  }
-
-  timer = setTimeout(tick, config.startDelay);
   return () => clearTimeout(timer);
 }
 
@@ -213,6 +178,8 @@ function scrollReveal(config: ScrollRevealConfig) {
 // ---------------------------------------------------------------------------
 
 export function initAnimations() {
+  const heroSpark = document.querySelector<HTMLElement>("#hero-spark");
+
   typewriter({
     charSelector: "#hero-spark .hero-char",
     cursorSelector: "#hero-cursor",
@@ -224,14 +191,9 @@ export function initAnimations() {
       [2, 250, 100],
     ],
     cursorLingerDelay: 200,
-  });
-
-  randomDrift({
-    selectors: [".hero-line-top", ".hero-line-bottom"],
-    stillChance: 0.35,
-    displacement: [4, 6],
-    interval: [2000, 5000],
-    startDelay: 2000,
+    onComplete: () => {
+      if (heroSpark) glitchOnce(heroSpark, { duration: 400, intensity: 0.5 });
+    },
   });
 
   marquee({

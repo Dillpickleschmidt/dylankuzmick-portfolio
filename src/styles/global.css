@@ -182,10 +182,6 @@ a {
 }
 
 /* Hero name animations */
-.hero-line-top, .hero-line-bottom {
-  transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
 .hero-char {
   display: none;
 }

@@ -1,7 +1,7 @@
 ---
 ---
 
-<div class="wd not-prose" data-active-group="1" data-active-ws="terminal">
+<div class="wd not-prose glitch-root" data-active-group="1" data-active-ws="terminal">
   <!-- Group headers -->
   <div class="wd-groups">
     <div class="wd-group" data-group="1">
@@ -410,7 +410,12 @@
     color: var(--color-text-muted);
     opacity: 0.5;
     flex-shrink: 0;
-    cursor: default;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .wd-close:hover {
+    opacity: 1;
   }
 
   .wd-page {
@@ -539,6 +544,9 @@
 </style>
 
 <script>
+  import '../styles/glitch.css';
+  import { initSegfault } from '../lib/glitch';
+
   const root = document.querySelector('.wd') as HTMLElement;
   const tabs = root.querySelectorAll('.wd-tab') as NodeListOf<HTMLButtonElement>;
   const groups = root.querySelectorAll('.wd-group') as NodeListOf<HTMLElement>;
@@ -564,4 +572,6 @@
       setView(g, lastWs[g]);
     });
   });
+
+  initSegfault(root, '.wd-close');
 </script>

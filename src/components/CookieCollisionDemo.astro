@@ -1,7 +1,7 @@
 ---
 ---
 
-<div class="cd not-prose" id="cookie-demo">
+<div class="cd not-prose glitch-root" id="cookie-demo">
   <div class="cd-grid">
     <!-- Chat App panel -->
     <div class="cd-panel" id="p-chat" data-accent="green">
@@ -121,7 +121,12 @@
     color: var(--color-text-muted);
     opacity: 0.5;
     flex-shrink: 0;
-    cursor: default;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .cd-close:hover {
+    opacity: 1;
   }
 
   .cd-url-bar {
@@ -362,6 +367,9 @@
 </style>
 
 <script>
+  import '../styles/glitch.css';
+  import { initSegfault } from '../lib/glitch';
+
   const $ = (s: string) => document.querySelector(s)!;
 
   const bodyChat = $('#body-chat') as HTMLElement;
@@ -490,4 +498,6 @@
   btnReset.addEventListener('click', () => { mode = 'shared'; reset(); });
 
   renderJar();
+
+  initSegfault(document.querySelector('#cookie-demo') as HTMLElement, '.cd-close');
 </script>
