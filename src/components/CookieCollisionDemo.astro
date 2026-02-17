@@ -1,0 +1,500 @@
+---
+---
+
+<div class="cd not-prose" id="cookie-demo">
+  <div class="cd-grid">
+    <!-- Chat App panel -->
+    <div class="cd-panel" id="p-chat" data-accent="green">
+      <div class="cd-chrome">
+        <div class="cd-dots"><i></i><i></i><i></i></div>
+        <div class="cd-url-bar">
+          <svg class="cd-lock" viewBox="0 0 12 14" fill="currentColor"><path d="M10 5V4a4 4 0 0 0-8 0v1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM4 4a2 2 0 1 1 4 0v1H4V4Z" opacity=".45"/></svg>
+          <span>localhost:3000</span>
+        </div>
+      </div>
+      <div class="cd-body" id="body-chat">
+        <span class="cd-app-tag">Chat App</span>
+        <button type="button" class="cd-login" id="btn-chat">
+          <span class="cd-login-icon">&#x279C;</span>
+          Log in as Alice
+        </button>
+        <div class="cd-session cd-hidden" id="session-chat">
+          <span class="cd-avatar" id="avatar-chat">A</span>
+          <span>Logged in as <strong id="name-chat">Alice</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Portfolio panel -->
+    <div class="cd-panel" id="p-port" data-accent="orange">
+      <div class="cd-chrome">
+        <div class="cd-dots"><i></i><i></i><i></i></div>
+        <div class="cd-url-bar">
+          <svg class="cd-lock" viewBox="0 0 12 14" fill="currentColor"><path d="M10 5V4a4 4 0 0 0-8 0v1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM4 4a2 2 0 1 1 4 0v1H4V4Z" opacity=".45"/></svg>
+          <span>localhost:5173</span>
+        </div>
+      </div>
+      <div class="cd-body" id="body-port">
+        <span class="cd-app-tag">Portfolio</span>
+        <button type="button" class="cd-login" id="btn-port">
+          <span class="cd-login-icon">&#x279C;</span>
+          Log in as Bob
+        </button>
+        <div class="cd-session cd-hidden" id="session-port">
+          <span class="cd-avatar" id="avatar-port">B</span>
+          <span>Logged in as <strong id="name-port">Bob</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie jar -->
+  <div class="cd-jar">
+    <span class="cd-jar-label" id="jar-label">cookie jar &mdash; localhost</span>
+    <code class="cd-jar-val" id="jar-val">&empty;</code>
+  </div>
+
+  <!-- Footer — appears after collision -->
+  <div class="cd-foot cd-hidden" id="cd-foot">
+    <p class="cd-caption" id="cd-caption"></p>
+    <div class="cd-actions">
+      <button type="button" class="cd-btn-ns cd-hidden" id="btn-ns">Try with namespaces &rarr;</button>
+      <button type="button" class="cd-btn-reset cd-hidden" id="btn-reset">Reset</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ---- tokens ---- */
+  .cd {
+    --green: #4a9a6a;
+    --green-dim: rgba(74, 154, 106, 0.08);
+    --green-glow: rgba(74, 154, 106, 0.25);
+    --orange: #e8603c;
+    --orange-dim: rgba(232, 96, 60, 0.08);
+    --orange-glow: rgba(232, 96, 60, 0.25);
+    --red: #e04646;
+    --red-dim: rgba(224, 70, 70, 0.06);
+    --red-glow: rgba(224, 70, 70, 0.3);
+    --chrome: #161616;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    margin: 2.25em 0;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  /* ---- grid ---- */
+  .cd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cd-grid > :first-child { border-right: 1px solid var(--color-border); }
+
+  @media (max-width: 520px) {
+    .cd-grid { grid-template-columns: 1fr; }
+    .cd-grid > :first-child { border-right: none; border-bottom: 1px solid var(--color-border); }
+  }
+
+  /* ---- panel ---- */
+  .cd-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- browser chrome ---- */
+  .cd-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--chrome);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .cd-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .cd-dots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: block;
+  }
+
+  .cd-dots i:nth-child(1) { background: #e05050; }
+  .cd-dots i:nth-child(2) { background: #e0b040; }
+  .cd-dots i:nth-child(3) { background: #4a9a6a; }
+
+  .cd-url-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 3px 8px;
+  }
+
+  .cd-lock {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  /* ---- body ---- */
+  .cd-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    min-height: 100px;
+    position: relative;
+    transition: background 0.5s var(--ease);
+  }
+
+  .cd-app-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  [data-accent="green"] .cd-app-tag { color: var(--green); }
+  [data-accent="orange"] .cd-app-tag { color: var(--orange); }
+
+  /* ---- login button ---- */
+  .cd-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+  }
+
+  .cd-login-icon {
+    font-size: 0.85em;
+    opacity: 0.4;
+    transition: opacity 0.2s, transform 0.2s var(--ease);
+  }
+
+  [data-accent="green"] .cd-login { animation: pulse-green 2.5s ease-in-out infinite; }
+  [data-accent="green"] .cd-login:hover {
+    border-color: var(--green);
+    background: var(--green-dim);
+    color: #c8e8d4;
+  }
+  [data-accent="green"] .cd-login:hover .cd-login-icon { opacity: 1; transform: translateX(2px); color: var(--green); }
+
+  [data-accent="orange"] .cd-login { animation: pulse-orange 2.5s ease-in-out infinite; }
+  [data-accent="orange"] .cd-login:hover {
+    border-color: var(--orange);
+    background: var(--orange-dim);
+    color: #f0d0c4;
+  }
+  [data-accent="orange"] .cd-login:hover .cd-login-icon { opacity: 1; transform: translateX(2px); color: var(--orange); }
+
+  .cd-login:hover { animation: none; }
+  .cd-login:active { transform: scale(0.97); }
+
+  @keyframes pulse-green {
+    0%, 100% { border-color: var(--color-border); }
+    50% { border-color: rgba(74, 154, 106, 0.5); }
+  }
+
+  @keyframes pulse-orange {
+    0%, 100% { border-color: var(--color-border); }
+    50% { border-color: rgba(232, 96, 60, 0.5); }
+  }
+
+  /* ---- session display ---- */
+  .cd-session {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    color: var(--color-text);
+    padding: 4px 0;
+    animation: cd-fade-in 0.35s var(--ease);
+  }
+
+  @keyframes cd-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cd-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  [data-accent="green"] .cd-avatar { background: var(--green); color: #0f0f0f; }
+  [data-accent="green"] .cd-session strong { color: var(--green); }
+  [data-accent="orange"] .cd-avatar { background: var(--orange); color: #0f0f0f; }
+  [data-accent="orange"] .cd-session strong { color: var(--orange); }
+
+  /* Overwritten state — avatar and name go red */
+  .cd-session.cd-collision strong { color: var(--red) !important; }
+  .cd-session.cd-collision .cd-avatar { background: var(--red) !important; }
+
+  .cd-hidden { display: none !important; }
+
+  /* ---- body flash animations ---- */
+  .cd-body.cd-flash-green { animation: cd-bg-green 0.7s var(--ease); }
+  .cd-body.cd-flash-red { animation: cd-bg-red 0.7s var(--ease); }
+
+  @keyframes cd-bg-green {
+    0% { background: var(--green-dim); }
+    100% { background: transparent; }
+  }
+
+  @keyframes cd-bg-red {
+    0%, 15% { background: var(--red-dim); }
+    100% { background: transparent; }
+  }
+
+  /* ---- cookie jar ---- */
+  .cd-jar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-top: 1px solid var(--color-border);
+    background: var(--chrome);
+  }
+
+  .cd-jar-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .cd-jar-val {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    opacity: 0.35;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: color 0.3s, opacity 0.3s;
+  }
+
+  .cd-jar-val.cd-has-val {
+    opacity: 1;
+    color: var(--green);
+  }
+
+  /* ---- footer ---- */
+  .cd-foot {
+    border-top: 1px solid var(--color-border);
+    padding: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    animation: cd-fade-in 0.4s var(--ease);
+  }
+
+  .cd-caption {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--color-text-muted);
+    margin: 0;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .cd-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .cd-btn-ns, .cd-btn-reset {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    border-radius: 5px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid;
+  }
+
+  .cd-btn-ns {
+    background: var(--green);
+    border-color: var(--green);
+    color: #0f0f0f;
+    font-weight: 600;
+  }
+  .cd-btn-ns:hover { background: var(--color-accent-hover); border-color: var(--color-accent-hover); }
+
+  .cd-btn-reset {
+    background: transparent;
+    border-color: var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .cd-btn-reset:hover { border-color: var(--color-text-muted); }
+</style>
+
+<script>
+  const $ = (s: string) => document.querySelector(s)!;
+
+  const bodyChat = $('#body-chat') as HTMLElement;
+  const bodyPort = $('#body-port') as HTMLElement;
+  const btnChat = $('#btn-chat') as HTMLButtonElement;
+  const btnPort = $('#btn-port') as HTMLButtonElement;
+  const sessionChat = $('#session-chat') as HTMLElement;
+  const sessionPort = $('#session-port') as HTMLElement;
+  const avatarChat = $('#avatar-chat') as HTMLElement;
+  const avatarPort = $('#avatar-port') as HTMLElement;
+  const nameChat = $('#name-chat') as HTMLElement;
+  const namePort = $('#name-port') as HTMLElement;
+
+  const jarLabel = $('#jar-label') as HTMLElement;
+  const jarVal = $('#jar-val') as HTMLElement;
+
+  const foot = $('#cd-foot') as HTMLElement;
+  const caption = $('#cd-caption') as HTMLElement;
+  const btnNs = $('#btn-ns') as HTMLButtonElement;
+  const btnReset = $('#btn-reset') as HTMLButtonElement;
+
+  let mode: 'shared' | 'namespaced' = 'shared';
+  let chatUser: string | null = null;
+  let portUser: string | null = null;
+
+  function flash(el: HTMLElement, cls: string) {
+    el.classList.remove('cd-flash-green', 'cd-flash-red');
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+
+  function renderJar() {
+    if (mode === 'shared') {
+      jarLabel.innerHTML = 'cookie jar &mdash; localhost';
+      const val = portUser ?? chatUser;
+      if (val) {
+        jarVal.textContent = `session=${val.toLowerCase()}`;
+        jarVal.classList.add('cd-has-val');
+      } else {
+        jarVal.innerHTML = '&empty;';
+        jarVal.classList.remove('cd-has-val');
+      }
+    } else {
+      jarLabel.innerHTML = 'cookie jars &mdash; isolated';
+      const parts: string[] = [];
+      if (chatUser) parts.push(`session=${chatUser.toLowerCase()}`);
+      if (portUser) parts.push(`session=${portUser.toLowerCase()}`);
+      if (parts.length) {
+        jarVal.textContent = parts.join('   ');
+        jarVal.classList.add('cd-has-val');
+      } else {
+        jarVal.innerHTML = '&empty;';
+        jarVal.classList.remove('cd-has-val');
+      }
+    }
+  }
+
+  function setSession(side: 'chat' | 'port', user: string, collision: boolean) {
+    const session = side === 'chat' ? sessionChat : sessionPort;
+    const avatar = side === 'chat' ? avatarChat : avatarPort;
+    const name = side === 'chat' ? nameChat : namePort;
+    const btn = side === 'chat' ? btnChat : btnPort;
+    const body = side === 'chat' ? bodyChat : bodyPort;
+
+    avatar.textContent = user[0];
+    name.textContent = user;
+    btn.classList.add('cd-hidden');
+    session.classList.remove('cd-hidden');
+
+    if (collision) {
+      session.classList.add('cd-collision');
+      flash(body, 'cd-flash-red');
+    } else {
+      session.classList.remove('cd-collision');
+      flash(body, 'cd-flash-green');
+    }
+  }
+
+  function showFooter(text: string) {
+    caption.textContent = text;
+    foot.classList.remove('cd-hidden');
+  }
+
+  function reset() {
+    chatUser = null;
+    portUser = null;
+    for (const s of [sessionChat, sessionPort]) { s.classList.add('cd-hidden'); s.classList.remove('cd-collision'); }
+    for (const b of [btnChat, btnPort]) b.classList.remove('cd-hidden');
+    foot.classList.add('cd-hidden');
+    btnNs.classList.add('cd-hidden');
+    btnReset.classList.add('cd-hidden');
+    renderJar();
+  }
+
+  btnChat.addEventListener('click', () => {
+    chatUser = 'Alice';
+    setSession('chat', 'Alice', false);
+
+    if (mode === 'shared' && portUser) {
+      portUser = 'Alice';
+      setSession('port', 'Alice', true);
+      showFooter('Both apps share localhost \u2014 logging in here overwrote the other session.');
+      btnNs.classList.remove('cd-hidden');
+    }
+    renderJar();
+  });
+
+  btnPort.addEventListener('click', () => {
+    portUser = 'Bob';
+    setSession('port', 'Bob', false);
+
+    if (mode === 'shared' && chatUser) {
+      chatUser = 'Bob';
+      setSession('chat', 'Bob', true);
+      showFooter('Both apps share localhost \u2014 logging in here overwrote the other session.');
+      btnNs.classList.remove('cd-hidden');
+    }
+    if (mode === 'namespaced' && chatUser) {
+      showFooter('Isolated namespaces \u2014 both sessions persist.');
+      btnReset.classList.remove('cd-hidden');
+    }
+    renderJar();
+  });
+
+  btnNs.addEventListener('click', () => { mode = 'namespaced'; reset(); });
+  btnReset.addEventListener('click', () => { mode = 'shared'; reset(); });
+
+  renderJar();
+</script>

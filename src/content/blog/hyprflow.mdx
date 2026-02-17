@@ -5,6 +5,8 @@ description: "AI coding agents made parallel development possible. But your OS w
 image: "/blogs/hyprflow/spider-man-meme.webp"
 ---
 
+import CookieCollisionDemo from '../../components/CookieCollisionDemo.astro';
+
 # Every Developer's Localhost Is Broken (And Linux Can Fix It)
 
 Developers are eager to do more. AI agents finally make parallel work feel within reach. But try it, and the time spent juggling ports, tabs, and windows chips away at the productivity you hoped to gain. Port 3000 is already in use. Auth cookies bleed between projects. And nothing groups your tools by project.
@@ -14,6 +16,8 @@ Developers are eager to do more. AI agents finally make parallel work feel withi
 Theo's [_Agentic Coding Has A HUGE Problem_](https://www.youtube.com/watch?v=YVq28OTPCKw) video laid this out well and I'd recommend watching it if you haven't already. The short version: AI coding agents take long enough that you naturally start working on multiple projects at once, and they're good enough that you don't always need to babysit them. But the moment you start multitasking, everything slows down. This boils down to two problems:
 
 **Isolation.** Your projects share the same network. Two dev servers can't bind to the same port. Auth cookies for `localhost` bleed between projects. A database on `localhost:5432` belongs to whoever started it first.
+
+<CookieCollisionDemo />
 
 **Organization.** Nothing groups your tools by project. Terminal tabs, browser tabs, editor windows — they all live in one flat pile. You're the one mentally tracking which IDE is which project, which terminal is running which server, which browser tab goes with which editor. Eventually, you find it, then a notification pops up that Claude Code finished — but which project was that for again?
 
