@@ -120,7 +120,7 @@ Namespaces handle most apps out of the box. But browsers and Docker don't fit ne
 
 Browsers are a special case. Chromium, Firefox, and everything built on them enforce a single-process model — when you open a new window, it doesn't start a fresh process. It connects to the browser that's already running. This means every browser window on your machine shares the same network stack, cookies, localStorage, and cache, regardless of which workspace it's on.
 
-It gets worse. Browsers treat all of `localhost` as a single origin — `localhost:3000` and `localhost:5432` share the same cookies, localStorage, IndexedDB, and Service Workers. Ports don't matter. So even if you could somehow put different browser windows in different namespaces, Group 1's auth tokens and Group 2's auth tokens would still collide because they're all just `localhost`.
+It gets worse. Browsers treat all of `localhost` as a single origin — `localhost:3000` and `localhost:5432` share the same cookies, localStorage, IndexedDB, and Service Workers. Ports don't matter. And even if you solved the single-process problem, namespace isolation alone wouldn't be enough — a shared browser profile stores all `localhost` cookies and localStorage in one place, so Group 1's auth tokens and Group 2's auth tokens would still collide.
 
 Hyprflow solves both problems at once using [firejail](https://github.com/netblue30/firejail), a Linux sandboxing tool that can launch a process inside a specific network namespace (among other things). Each group gets its own isolated browser process with its own profile directory:
 
