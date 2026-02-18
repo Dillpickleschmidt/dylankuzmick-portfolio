@@ -8,6 +8,7 @@ const blog = defineCollection({
 		date: z.string(),
 		description: z.string(),
 		image: z.string().optional(),
+		video: z.string().optional(),
 	}),
 });
 

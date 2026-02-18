@@ -32,9 +32,20 @@ const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 					<p class="text-text-muted mt-4 text-lg leading-relaxed max-w-2xl">{post.data.description}</p>
 				</div>
 				{post.data.image && (
-					<div class="w-full md:w-80 aspect-[16/10] rounded-lg bg-surface overflow-hidden shrink-0">
-						<img src={post.data.image} alt="" class="w-full h-full object-cover" />
-					</div>
+					post.data.video ? (
+						<a href={post.data.video} target="_blank" rel="noopener noreferrer" class="group/play relative w-full md:w-80 aspect-[16/10] rounded-lg bg-surface overflow-hidden shrink-0 block">
+							<img src={post.data.image} alt="" class="w-full h-full object-cover" />
+							<div class="absolute inset-0 flex items-center justify-center">
+								<div class="w-14 h-14 rounded-full bg-black/50 flex items-center justify-center group-hover/play:bg-black/70 transition-colors duration-200">
+									<svg class="w-6 h-6 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+								</div>
+							</div>
+						</a>
+					) : (
+						<div class="w-full md:w-80 aspect-[16/10] rounded-lg bg-surface overflow-hidden shrink-0">
+							<img src={post.data.image} alt="" class="w-full h-full object-cover" />
+						</div>
+					)
 				)}
 			</div>
 
