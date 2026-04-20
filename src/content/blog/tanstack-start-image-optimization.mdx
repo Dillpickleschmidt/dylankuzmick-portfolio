@@ -1,0 +1,306 @@
+---
+title: "Next.js-style image optimization in TanStack Start"
+date: "2026-04-19"
+description: "TanStack Start doesn't ship a `next/image` equivalent. Here's how I built one with API routes and Cloudflare Images."
+image: "/blogs/tanstack-start-image-optimization/hero.jpg"
+---
+
+# Next.js-style image optimization in TanStack Start
+
+At some point, if you move from Next.js to TanStack Start, you will find that you need to manually optimize your images for production (since there's no `Image` component).
+
+TanStack's migration docs point to [Unpic](https://unpic.pics/img/react/), but Unpic cannot actually resize or optimize images by itself. It can generate responsive image markup and URLs, but something else still has to handle resizing, format conversion, and caching.
+
+If your app is built with Vite, your images live in the public directory, and you want behavior closer to Next's built-in image component without adding another service to manage, this becomes a problem you have to solve.
+
+This is the setup I ended up with in [nihongo-ninja](https://github.com/Dillpickleschmidt/nihongo-ninja):
+
+- Built-in images stay in the public directory
+- User uploads are stored separately in R2
+- TanStack Start routes handle the request flow
+- Cloudflare Images does the actual resizing and format conversion
+- Unpic handles responsive markup and URL generation
+
+One image pipeline for both built-in assets and user uploads, no separate image service to deploy, no rewriting image paths across the app.
+
+Yes, this still uses a third party for the transformation step. In my case that was Cloudflare, but I was already using it for hosting, storage, and domain proxying, so this did not add another account or billing relationship to manage. It also has a generous free tier.
+
+## Step 1: wire up Cloudflare
+
+You will need Image Transformations enabled on your Cloudflare zone, plus the `IMAGES` binding in `wrangler.jsonc`:
+
+```jsonc
+{
+  "main": "@tanstack/solid-start/server-entry",
+  "images": {
+    "binding": "IMAGES",
+    "remote": true
+  }
+}
+```
+
+That binding name is what makes `env.IMAGES` available inside your server routes.
+
+If you also want uploads, add an R2 bucket binding:
+
+```jsonc
+{
+  "r2_buckets": [
+    {
+      "binding": "IMAGE_UPLOADS_BUCKET",
+      "bucket_name": "your-bucket-name",
+      "preview_bucket_name": "your-bucket-name",
+      "remote": true
+    }
+  ]
+}
+```
+
+If you only care about built-in images in the public directory, you can skip the R2 binding here and Step 3. Steps 4 and 5 still apply, just ignore the private variants of the helpers shown there.
+
+## Step 2: add a public image route
+
+Server routes in TanStack Start live in `src/routes` alongside normal route files. A `server.handlers` block is what makes them handle raw HTTP requests instead of rendering a page.
+
+The public route in `nihongo-ninja` looks like this:
+
+```ts
+export const Route = createFileRoute("/api/images/public/$")({
+  server: {
+    handlers: {
+      GET: async ({ request, params }) => {
+        const src = params._splat
+        if (!src) return new Response("Invalid path", { status: 400 })
+
+        const url = new URL(request.url)
+        const { w: width } = imageWidthQuerySchema.parse({
+          w: url.searchParams.get("w") ?? undefined,
+        })
+
+        // Rebuild the original file URL on the same origin.
+        const assetUrl = new URL(`/${src}`, url.origin)
+        // Prevent recursive requests back into the API routes.
+        if (assetUrl.pathname.startsWith("/api/")) {
+          return new Response("Invalid path", { status: 400 })
+        }
+
+        const source = await fetch(assetUrl)
+        if (!source.ok || !source.body) {
+          return new Response("Not found", { status: 404 })
+        }
+
+        // Pick the best output format the browser supports.
+        const format = chooseOutputFormat(
+          request.headers.get("accept"),
+          source.headers.get("content-type") ?? "image/jpeg",
+        )
+
+        const result = await env.IMAGES
+          .input(source.body)
+          .transform({ width, fit: "scale-down" })
+          .output({ format, quality: 80 })
+
+        return new Response(result.response().body, {
+          headers: {
+            "Content-Type": result.contentType(),
+            "Cache-Control": "public, max-age=31536000, immutable",
+            Vary: "Accept",
+          },
+        })
+      },
+    },
+  },
+})
+```
+
+The route never reads from `public/` directly. It rebuilds the original `/img/...` URL on the same origin and fetches it back over HTTP, letting the normal static asset handler serve the bytes. Those bytes then get piped through Cloudflare Images.
+
+That means the source asset still lives at a normal path like `/img/backgrounds/foo.jpg`. I did not have to move those files somewhere special or change how the app stores them. The optimization just happens when the browser requests the API route version.
+
+If you want a file from `public/img/backgrounds/foo.jpg`, the browser hits:
+
+`/api/images/public/img/backgrounds/foo.jpg?w=1200`
+
+The `$` catch-all is what makes that nested path work.
+
+## Step 3: add uploads and a private image route
+
+For custom user uploads, you store the original file once, save a little metadata, and serve transformed versions through another server route.
+
+Uploads go through a dedicated route:
+
+```ts
+export const Route = createFileRoute("/api/images/upload")({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        const { session } = await fetchBetterAuthSession(request)
+        if (!session) {
+          return new Response("Unauthenticated", { status: 401 })
+        }
+
+        const contentLength = Number(request.headers.get("content-length"))
+        if (contentLength > MAX_PRIVATE_IMAGE_UPLOAD_BYTES) {
+          return new Response("Image exceeds 10MB limit", { status: 413 })
+        }
+
+        // The client tells us the original width up front.
+        const parsedHeaders = uploadImageHeadersSchema.safeParse({
+          contentType: request.headers.get("content-type") ?? "",
+          sourceWidth: Number(request.headers.get("x-image-width")),
+        })
+        if (!parsedHeaders.success) {
+          return new Response("Invalid upload", { status: 400 })
+        }
+
+        const imageId = `${IMAGE_ID_PREFIX}${crypto.randomUUID()}`
+        const storageKey = `private/users/${session.user.id}/images/${imageId}/original`
+
+        const object = await env.IMAGE_UPLOADS_BUCKET.put(storageKey, request.body, {
+          httpMetadata: { contentType: parsedHeaders.data.contentType },
+        })
+
+        await fetchAuthenticatedConvexMutation(api.api.images.createImageAsset, {
+          imageId,
+          storageKey,
+          contentType: parsedHeaders.data.contentType,
+          sourceWidth: parsedHeaders.data.sourceWidth,
+          objectEtag: object.httpEtag,
+        })
+
+        return Response.json({ imageId }, { status: 201 })
+      },
+    },
+  },
+})
+```
+
+The `x-image-width` header is the part worth calling out. The server needs the original width up front so Unpic can generate sensible breakpoints later. The client sends it like this:
+
+```ts
+const width = await readImageWidth(file)
+
+await fetch("/api/images/upload", {
+  method: "POST",
+  headers: {
+    "content-type": file.type,
+    "x-image-width": String(width),
+  },
+  body: file,
+})
+```
+
+How you measure the width does not matter much. `createImageBitmap`, an `Image` element, whatever you prefer. The server just needs to receive it.
+
+The original goes to R2, and Convex stores `imageId`, `storageKey`, `contentType`, `sourceWidth`, and `objectEtag`. The private image route then looks up that metadata, verifies the user owns the image, loads the original from R2, and runs the same transform:
+
+```ts
+const format = chooseOutputFormat(
+  request.headers.get("accept"),
+  asset.contentType,
+)
+
+const object = await env.IMAGE_UPLOADS_BUCKET.get(asset.storageKey)
+if (!object?.body) {
+  return new Response("Not found", { status: 404 })
+}
+
+const result = await env.IMAGES
+  .input(object.body)
+  .transform({ width: w, fit: "scale-down" })
+  .output({ format, quality: 80 })
+```
+
+The route returns `404` for both missing and unowned images, so it does not leak whether an image exists. Public responses are cached as `public, max-age=31536000, immutable`. Private responses use `private, max-age=31536000, immutable` and include an `ETag`.
+
+## Step 4: point Unpic at your routes
+
+Unpic exposes base primitives that let you bring your own transformer. A transformer is just a function that takes an image source plus some options (usually a width) and returns a URL.
+
+The built-in providers are designed for images that already live behind a known CDN or image service. Mine were either local app assets or private files in R2, so I needed custom transformers pointed at my own API routes:
+
+```ts
+const publicTransformer: UnpicImageSource["transformer"] = (src, { width }) => {
+  const path = encodeURI(src.toString().replace(/^\/+/, ""))
+  const query = typeof width === "number" ? `?w=${width}` : ""
+  return `/api/images/public/${path}${query}`
+}
+
+const privateTransformer: UnpicImageSource["transformer"] = (src, { width }) => {
+  const id = encodeURIComponent(src.toString())
+  const query = typeof width === "number" ? `?w=${width}` : ""
+  return `/api/images/private/${id}${query}`
+}
+```
+
+Now Unpic generates a normal `srcset` list, but the URLs point at a real optimization layer.
+
+I also cap the generated breakpoints to the source image's width <span style="font-size: 0.85em; color: var(--color-text-muted);">(to have a pixel-perfect max size)</span>:
+
+```ts
+export function breakpointsFor(
+  args: LayoutArgs & { sourceWidth: number },
+): number[] {
+  const raw = getBreakpoints({
+    layout: args.layout,
+    width: args.layout === "fixed" ? args.width : undefined,
+    resolutions: DEFAULT_RESOLUTIONS,
+  })
+
+  const maxBreakpoint = Math.max(...raw)
+  const ceiling = Math.min(args.sourceWidth, maxBreakpoint)
+  const capped = raw.filter((w) => w <= ceiling)
+
+  if (args.sourceWidth < maxBreakpoint && !capped.includes(args.sourceWidth)) {
+    capped.push(args.sourceWidth)
+  }
+
+  return capped
+}
+```
+
+The browser never requests widths larger than the original supports, but the exact source width is added as its own breakpoint when smaller than Unpic's largest preset, so the browser can still request the native size instead of stopping at the nearest lower one.
+
+## Step 5: use the generated source in your image component
+
+Build a source object, then pass its `src`, `transformer`, and `breakpoints` into Unpic's base image component:
+
+```tsx
+const source = buildPublicUnpicSource({
+  src: "/img/backgrounds/foo.jpg",
+  sourceWidth: 3999,
+  layout: { layout: "fixed", width: 320 },
+})
+
+<BaseImage
+  src={source.src}
+  transformer={source.transformer}
+  breakpoints={source.breakpoints}
+  layout="fixed"
+  width={320}
+  height={200}
+  alt="Background preview"
+/>
+```
+
+For uploads, the shape is the same. The source just comes from `buildPrivateUnpicSource(...)` instead.
+
+The whole flow:
+
+1. Public assets or uploaded originals exist somewhere stable
+2. Server routes know how to transform them
+3. Unpic generates width-specific URLs that point at those routes
+4. The browser picks the best one from the generated `srcset`
+
+## Compared to Next.js's `Image`
+
+You are still taking on more of the pipeline than `next/image` gives you. You wire up the server routes yourself and depend on Cloudflare Images for the actual transformation step, so this is not zero-infrastructure.
+
+What I liked:
+
+- The public directory still works normally
+- I did not need to rewrite image imports across the app
+- Public assets and private uploads use the same general model
+- I did not need to run a separate image service
+
+A reasonable fit for the constraints I had. The same general approach should work in any Vite-based app, though TanStack Start gave me a convenient place to build the route layer.
