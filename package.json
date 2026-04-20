@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "astro build && wrangler pages deploy ./dist --project-name=dylankuzmick-portfolio"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
@@ -15,5 +16,8 @@
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.1",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "wrangler": "^4.83.0"
   }
 }
