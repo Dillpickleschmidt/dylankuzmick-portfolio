@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { renderInlineMarkdown } from '../../lib/inline-markdown';
 const posts = (await getCollection('blog')).sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 const [latest, ...rest] = posts;
 ---
@@ -28,7 +29,7 @@ const [latest, ...rest] = posts;
 				</div>
 				<div>
 					<h3 class="font-serif text-3xl md:text-4xl font-semibold tracking-tight group-hover:text-accent transition-colors duration-300 leading-tight">{latest.data.title}</h3>
-					<p class="text-text-muted mt-3 text-sm md:text-base leading-relaxed">{latest.data.description}</p>
+					<p class="text-text-muted mt-3 text-sm md:text-base leading-relaxed" set:html={renderInlineMarkdown(latest.data.description)}></p>
 					<div class="flex items-center gap-3 mt-5 font-mono text-xs uppercase tracking-[0.08em] text-text-muted/60">
 						<time>{latest.data.date}</time>
 						<span class="w-1 h-1 rounded-full bg-text-muted/40"></span>
@@ -58,7 +59,7 @@ const [latest, ...rest] = posts;
 						)}
 					</div>
 					<h4 class="text-base font-medium group-hover:text-accent transition-colors duration-200 leading-snug">{post.data.title}</h4>
-					<p class="text-sm text-text-muted/60 mt-1.5 line-clamp-2 leading-relaxed">{post.data.description}</p>
+					<p class="text-sm text-text-muted/60 mt-1.5 line-clamp-2 leading-relaxed" set:html={renderInlineMarkdown(post.data.description)}></p>
 					<time class="block mt-2 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted/40">{post.data.date}</time>
 				</a>
 			)) : (

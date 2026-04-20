@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { renderInlineMarkdown } from '../../lib/inline-markdown';
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
 	return posts.map((post) => ({
@@ -29,7 +30,7 @@ const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
 					<h1 class="font-serif text-[clamp(2.5rem,5vw,4rem)] leading-[1] tracking-tight font-semibold">
 						{post.data.title}
 					</h1>
-					<p class="text-text-muted mt-4 text-lg leading-relaxed max-w-2xl">{post.data.description}</p>
+					<p class="text-text-muted mt-4 text-lg leading-relaxed max-w-2xl" set:html={renderInlineMarkdown(post.data.description)}></p>
 				</div>
 				{post.data.image && (
 					post.data.video ? (
